@@ -73,7 +73,6 @@ export function usePOSModals() {
       },
     }));
 
-    // Reset related state when closing modals
     if (modalName === "gcashReference") {
       setGcashReference("");
     }
@@ -94,7 +93,6 @@ export function usePOSModals() {
     });
   }, [modals, closeModal]);
 
-  // Payment Modal
   const openPaymentModal = useCallback(() => {
     openModal("payment");
   }, [openModal]);
@@ -103,7 +101,6 @@ export function usePOSModals() {
     closeModal("payment");
   }, [closeModal]);
 
-  // Confirmation Modal
   const openConfirmationModal = useCallback(
     (confirmationData: ConfirmationData) => {
       openModal("confirmation", confirmationData);
@@ -115,7 +112,6 @@ export function usePOSModals() {
     closeModal("confirmation");
   }, [closeModal]);
 
-  // Held Orders Modal
   const openHeldOrdersModal = useCallback(() => {
     openModal("heldOrders");
   }, [openModal]);
@@ -124,7 +120,6 @@ export function usePOSModals() {
     closeModal("heldOrders");
   }, [closeModal]);
 
-  // Email Receipt Modal
   const openEmailReceiptModal = useCallback(
     (orderData?: any) => {
       openModal("emailReceipt", orderData);
@@ -136,7 +131,6 @@ export function usePOSModals() {
     closeModal("emailReceipt");
   }, [closeModal]);
 
-  // Receipt Selection Modal
   const openReceiptSelectionModal = useCallback(
     (orderData?: any) => {
       openModal("receiptSelection", orderData);
@@ -148,7 +142,6 @@ export function usePOSModals() {
     closeModal("receiptSelection");
   }, [closeModal]);
 
-  // GCash Reference Modal
   const openGcashReferenceModal = useCallback(() => {
     closePaymentModal();
     openModal("gcashReference");
@@ -158,7 +151,6 @@ export function usePOSModals() {
     closeModal("gcashReference");
   }, [closeModal]);
 
-  // Cash Payment Modal
   const openCashPaymentModal = useCallback(() => {
     closePaymentModal();
     openModal("cashPayment");
@@ -168,7 +160,6 @@ export function usePOSModals() {
     closeModal("cashPayment");
   }, [closeModal]);
 
-  // Notes Modal
   const openNotesModal = useCallback(
     (currentNotes: string = "") => {
       setTempNotes(currentNotes);
@@ -181,7 +172,6 @@ export function usePOSModals() {
     closeModal("notes");
   }, [closeModal]);
 
-  // Utility functions
   const isAnyModalOpen = useCallback((): boolean => {
     return Object.values(modals).some((modal) => modal.isOpen);
   }, [modals]);
@@ -201,10 +191,8 @@ export function usePOSModals() {
   );
 
   return {
-    // Modal states
     modals,
 
-    // Payment-related state
     selectedPaymentMethod,
     setSelectedPaymentMethod,
     gcashReference,
@@ -218,7 +206,6 @@ export function usePOSModals() {
     tempNotes,
     setTempNotes,
 
-    // Generic modal functions
     openModal,
     closeModal,
     closeAllModals,
@@ -226,7 +213,6 @@ export function usePOSModals() {
     getModalData,
     isAnyModalOpen,
 
-    // Specific modal functions
     openPaymentModal,
     closePaymentModal,
     openConfirmationModal,

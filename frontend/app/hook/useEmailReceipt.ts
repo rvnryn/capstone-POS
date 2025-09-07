@@ -35,7 +35,6 @@ export function useEmailReceipt(config: EmailConfig) {
     null
   );
 
-  // Initialize EmailJS
   useEffect(() => {
     const initEmailJS = () => {
       if (config.publicKey) {
@@ -45,7 +44,6 @@ export function useEmailReceipt(config: EmailConfig) {
             config.publicKey.substring(0, 10) + "..."
           );
 
-          // Check if EmailJS is loaded
           if (typeof window !== "undefined" && typeof emailjs !== "undefined") {
             emailjs.init(config.publicKey);
             console.log("EmailJS initialized successfully");
@@ -94,7 +92,6 @@ export function useEmailReceipt(config: EmailConfig) {
       setSendError(null);
 
       try {
-        // Format items for email template
         const itemsText = receiptData.items
           .map(
             (item) =>
@@ -102,7 +99,6 @@ export function useEmailReceipt(config: EmailConfig) {
           )
           .join("\n");
 
-        // Prepare template parameters
         const templateParams = {
           to_email: receiptData.customerEmail,
           user_email: receiptData.customerEmail,
@@ -113,7 +109,7 @@ export function useEmailReceipt(config: EmailConfig) {
           customer_name: receiptData.customerName,
           order_type: receiptData.orderType,
           order_items: itemsText,
-          items: itemsText, // Make sure items field is properly set
+          items: itemsText,
           subtotal: receiptData.subtotal.toFixed(2),
           vat: receiptData.vat.toFixed(2),
           discount: receiptData.discount.toFixed(2),
@@ -125,21 +121,17 @@ export function useEmailReceipt(config: EmailConfig) {
           store_name: "Cardiac Delights",
           store_address: "Your Store Address Here",
           store_contact: "Your Contact Information",
-          // Add order number and date/time fields that your template expects
+
           order_number: `#${(() => {
-            // For completed orders, use consistent sequential numbering
             if (receiptData.order?.id) {
-              // Use localStorage to maintain order mapping for consistency
               const orderMapping = JSON.parse(
                 localStorage.getItem("orderMapping") || "{}"
               );
 
-              // If this order ID already has a sequential number, return it
               if (orderMapping[receiptData.order.id]) {
                 return orderMapping[receiptData.order.id];
               }
 
-              // Generate new sequential number
               const currentCounter = parseInt(
                 localStorage.getItem("orderCounter") || "0",
                 10
@@ -147,7 +139,6 @@ export function useEmailReceipt(config: EmailConfig) {
               const nextCounter = currentCounter + 1;
               const sequentialNumber = String(nextCounter).padStart(3, "0");
 
-              // Store the mapping and update counter
               orderMapping[receiptData.order.id] = sequentialNumber;
               localStorage.setItem(
                 "orderMapping",
@@ -158,7 +149,6 @@ export function useEmailReceipt(config: EmailConfig) {
               return sequentialNumber;
             }
 
-            // For orders without ID, generate a new sequential number
             const currentCounter = parseInt(
               localStorage.getItem("orderCounter") || "0",
               10
@@ -190,7 +180,6 @@ export function useEmailReceipt(config: EmailConfig) {
           receiptData.customerEmail?.length
         );
 
-        // Check if EmailJS is properly loaded
         if (typeof emailjs === "undefined") {
           throw new Error(
             "EmailJS library not loaded - please ensure the script is included in your HTML"
@@ -203,7 +192,6 @@ export function useEmailReceipt(config: EmailConfig) {
           );
         }
 
-        // Additional check for EmailJS initialization
         console.log("EmailJS object:", emailjs);
         console.log("EmailJS send method type:", typeof emailjs.send);
 
@@ -228,30 +216,19 @@ export function useEmailReceipt(config: EmailConfig) {
         console.error("Error constructor:", error?.constructor?.name);
         console.error("Error keys:", Object.keys(error || {}));
 
-        // Log EmailJS specific error properties
         if (error && typeof error === "object") {
           const errorObj = error as any;
           console.error("EmailJS Status:", errorObj.status);
           console.error("EmailJS Text:", errorObj.text);
-
-          // Common EmailJS status codes:
-          // 200 = Success
-          // 400 = Bad Request (invalid template ID, service ID, or parameters)
-          // 401 = Unauthorized (invalid public key)
-          // 404 = Not Found (service or template not found)
-          // 422 = Unprocessable Entity (validation errors)
         }
 
         let errorMessage = "Unknown error occurred";
 
-        // Handle different types of errors
         if (error instanceof Error) {
           errorMessage = error.message;
         } else if (error && typeof error === "object") {
-          // Handle EmailJS error objects
           const errorObj = error as any;
 
-          // Handle EmailJSResponseStatus errors specifically
           if (errorObj.constructor?.name === "EmailJSResponseStatus") {
             const status = errorObj.status;
             const text = errorObj.text || "No error details provided";
@@ -288,7 +265,6 @@ export function useEmailReceipt(config: EmailConfig) {
           errorMessage = error;
         }
 
-        // Provide more specific error messages for common issues
         if (typeof errorMessage === "string") {
           if (
             errorMessage.includes("Invalid 'to' address") ||
@@ -486,12 +462,10 @@ export function useEmailReceipt(config: EmailConfig) {
   }, []);
 
   return {
-    // State
     isSending,
     sendError,
     lastSentReceipt,
 
-    // Functions
     sendEmailReceipt,
     generateReceiptData,
     generateReceiptHTML,

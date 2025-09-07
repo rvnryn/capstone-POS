@@ -37,7 +37,7 @@ a {
   text-decoration: none;
 }
 
-/* Terminal Blinking Animation */
+
 .blinking {
   animation: blink 1.5s infinite;
 }
@@ -53,12 +53,12 @@ a {
   }
 }
 
-/* Terminal Grid Pattern */
+
 .grid-cols-20 {
   grid-template-columns: repeat(20, minmax(0, 1fr));
 }
 
-/* Custom Scrollbar */
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
@@ -78,7 +78,7 @@ a {
   background: rgba(156, 163, 175, 0.5);
 }
 
-/* Text truncation utility */
+
 .line-clamp-2 {
   overflow: hidden;
   display: -webkit-box;
@@ -87,7 +87,7 @@ a {
   line-clamp: 2;
 }
 
-/* Smooth animations */
+
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
@@ -102,14 +102,14 @@ a {
   }
 }
 
-/* Focus states for accessibility */
+
 button:focus-visible,
 input:focus-visible {
   outline: 2px solid #10b981;
   outline-offset: 2px;
 }
 
-/* Notification animations */
+
 @keyframes slide-in-right {
   from {
     transform: translateX(100%);
@@ -125,12 +125,12 @@ input:focus-visible {
   animation: slide-in-right 0.3s ease-out;
 }
 
-/* Terminal Typography */
+
 .font-mono {
   font-family: "Courier New", "Lucida Console", Monaco, monospace;
 }
 
-/* Touch and Mouse Optimization */
+
 .touch-manipulation {
   touch-action: manipulation;
   -webkit-touch-callout: none;
@@ -141,19 +141,19 @@ input:focus-visible {
   user-select: none;
 }
 
-/* Better touch targets */
+
 button {
-  min-height: 44px; /* Apple's recommended minimum touch target */
+  min-height: 44px;
   min-width: 44px;
 }
 
-/* Improved button interactions */
+
 button:active {
   transform: scale(0.95);
   transition: transform 0.1s ease-in-out;
 }
 
-/* Prevent text selection on touch */
+
 .select-none {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -163,12 +163,12 @@ button:active {
   user-select: none;
 }
 
-/* Layout containment to prevent overflow */
+
 .layout-contained {
   contain: layout;
 }
 
-/* Prevent transform overflow */
+
 .transform-contained {
   transform-origin: center;
   will-change: transform;

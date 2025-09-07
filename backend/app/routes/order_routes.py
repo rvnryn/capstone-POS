@@ -7,7 +7,6 @@ from app.supabase import supabase
 router = APIRouter(prefix="/api/orders", tags=["orders"])
 
 
-# Pydantic models for request/response
 class OrderItemCreate(BaseModel):
     item_name: str
     unit_price: float
@@ -28,13 +27,12 @@ class OrderItemResponse(BaseModel):
 
 class OrderCreate(BaseModel):
     customer_name: str = "Walk-in Customer"
-    order_type: str = "Dining"  # "Dining" or "Takeout"
-    subtotal: float
+    order_type: str = "Dining"
     discount: float = 0.0
     vat: float
     total_amount: float
-    payment_method: Optional[str] = None  # "cash" or "gcash"
-    payment_reference: Optional[str] = None  # For GCash reference
+    payment_method: Optional[str] = None
+    payment_reference: Optional[str] = None
     amount_received: Optional[float] = None
     change_amount: Optional[float] = None
     order_status: str = "completed"
@@ -56,7 +54,7 @@ class OrderResponse(BaseModel):
     amount_received: Optional[float] = None
     change_amount: Optional[float] = None
     order_status: str
-    payment_status: Optional[str] = "Unpaid"  # Add payment_status field
+    payment_status: Optional[str] = "Unpaid"
     customer_notes: Optional[str] = None
     receipt_email: Optional[str] = None
     created_at: datetime
@@ -70,11 +68,9 @@ class OrderStatusUpdate(BaseModel):
 
 @router.post("/", response_model=OrderResponse)
 async def create_order(order_data: OrderCreate):
-    """Create a new order with order items"""
     try:
         print(f"Creating order with data: {order_data}")
 
-        # Insert order into orders table
         order_insert = {
             "customer_name": order_data.customer_name,
             "order_type": order_data.order_type,
@@ -91,7 +87,7 @@ async def create_order(order_data: OrderCreate):
             "receipt_email": order_data.receipt_email,
             "payment_status": (
                 "Paid" if order_data.order_status == "completed" else "Unpaid"
-            ),  # Set payment status based on order status
+            ),
         }
 
         print(f"Inserting order: {order_insert}")
@@ -103,14 +99,13 @@ async def create_order(order_data: OrderCreate):
 
         order_id = order_result.data[0]["order_id"]
 
-        # Insert order items
         order_items_insert = []
         for item in order_data.order_items:
             order_items_insert.append(
                 {
                     "order_id": order_id,
                     "item_name": item.item_name,
-                    "price": item.unit_price,  # Database expects 'price' column
+                    "price": item.unit_price,
                     "unit_price": item.unit_price,
                     "quantity": item.quantity,
                     "total_price": item.total_price,
@@ -123,13 +118,11 @@ async def create_order(order_data: OrderCreate):
             )
 
             if not items_result.data:
-                # Rollback order if items failed to insert
                 supabase.table("orders").delete().eq("order_id", order_id).execute()
                 raise HTTPException(
                     status_code=400, detail="Failed to create order items"
                 )
 
-        # Fetch the complete order with items
         return await get_order(order_id)
 
     except Exception as e:
@@ -142,7 +135,6 @@ async def create_order(order_data: OrderCreate):
 
 @router.get("/{order_id}", response_model=OrderResponse)
 async def get_order(order_id: int):
-    """Get a specific order by ID with its items"""
     try:
         # Get order details
         order_result = (
@@ -178,7 +170,6 @@ async def get_orders(
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
 ):
-    """Get orders with optional filtering"""
     try:
         query = supabase.table("orders").select("*")
 
@@ -215,7 +206,6 @@ async def get_orders(
 
 @router.put("/{order_id}/status", response_model=OrderResponse)
 async def update_order_status(order_id: int, status_data: OrderStatusUpdate):
-    """Update order status"""
     try:
         # Update order status
         update_result = (
@@ -246,13 +236,11 @@ async def update_order_status(order_id: int, status_data: OrderStatusUpdate):
 
 @router.get("/status/held", response_model=List[OrderResponse])
 async def get_held_orders():
-    """Get all held orders"""
     return await get_orders(status="held")
 
 
 @router.get("/today/summary")
 async def get_today_summary():
-    """Get today's orders summary"""
     try:
         today = datetime.now().date().isoformat()
 
@@ -287,7 +275,6 @@ async def get_today_summary():
 
 @router.delete("/{order_id}")
 async def delete_order(order_id: int):
-    """Delete an order (soft delete by updating status)"""
     try:
         # Update order status to cancelled instead of hard delete
         update_result = (

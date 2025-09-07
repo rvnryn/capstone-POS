@@ -15,7 +15,7 @@ export interface OrderItem {
 }
 
 export interface Order {
-  id?: number; // Optional for in-progress orders, assigned when saved to database
+  id?: number; 
   customer: string;
   type: string;
   items: OrderItem[];
@@ -36,7 +36,7 @@ export interface Notification {
 
 export function usePOSOrder() {
   const [currentOrder, setCurrentOrder] = useState<Order>({
-    id: undefined, // In-progress orders don't have database IDs until completed
+    id: undefined, 
     customer: "Walk-in Customer",
     type: "Dining",
     items: [],
@@ -53,10 +53,10 @@ export function usePOSOrder() {
 
   const createOrderApi = useCreateOrder();
   const getHeldOrdersApi = useGetHeldOrders();
-  const updateOrderStatusApi = useUpdateOrderStatus(0); // Will be updated dynamically
-  const deleteOrderApi = useDeleteOrder(0); // Will be updated dynamically
+  const updateOrderStatusApi = useUpdateOrderStatus(0); 
+  const deleteOrderApi = useDeleteOrder(0); 
 
-  // Auto-hide notifications
+  
   useEffect(() => {
     if (notification) {
       const timer = setTimeout(() => setNotification(null), 3000);
@@ -64,7 +64,7 @@ export function usePOSOrder() {
     }
   }, [notification]);
 
-  // Initialize held orders on mount (run once)
+  
   useEffect(() => {
     const initializeHeldOrders = async () => {
       try {
@@ -98,7 +98,7 @@ export function usePOSOrder() {
     };
 
     initializeHeldOrders();
-  }, []); // Empty dependency array - runs only once on mount
+  }, []); 
 
   const showNotification = useCallback(
     (message: string, type: Notification["type"] = "info") => {
@@ -116,7 +116,7 @@ export function usePOSOrder() {
 
         let newItems;
         if (existingItemIndex >= 0) {
-          // Update existing item quantity
+          
           newItems = prev.items.map((orderItem, index) => {
             if (index === existingItemIndex) {
               const newQuantity = orderItem.quantity + item.quantity;
@@ -129,7 +129,7 @@ export function usePOSOrder() {
             return orderItem;
           });
         } else {
-          // Add new item
+          
           const newItem: OrderItem = {
             ...item,
             id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
@@ -142,7 +142,7 @@ export function usePOSOrder() {
           (sum, orderItem) => sum + orderItem.total,
           0
         );
-        const vat = subtotal * 0.12; // 12% VAT
+        const vat = subtotal * 0.12; 
         const total = subtotal + vat - prev.discount;
 
         return {
@@ -215,7 +215,7 @@ export function usePOSOrder() {
       return {
         ...prev,
         discount: discountAmount,
-        total: Math.max(0, total), // Ensure total doesn't go negative
+        total: Math.max(0, total), 
       };
     });
   }, []);
@@ -296,7 +296,7 @@ export function usePOSOrder() {
       setIsProcessing(true);
 
       try {
-        // Create order data with correct field mapping for backend API
+        
         const orderData = {
           customer_name: currentOrder.customer,
           order_type: currentOrder.type,
@@ -342,7 +342,7 @@ export function usePOSOrder() {
 
   const newOrder = useCallback(() => {
     setCurrentOrder({
-      id: undefined, // In-progress orders don't have database IDs until completed
+      id: undefined, 
       customer: "Walk-in Customer",
       type: "Dining",
       items: [],
@@ -357,7 +357,7 @@ export function usePOSOrder() {
   const loadHeldOrders = useCallback(async () => {
     const result = await getHeldOrdersApi.execute();
     if (result) {
-      // Transform backend order format to frontend format
+      
       const transformedOrders = result.map((order: any) => ({
         id: order.order_id,
         customer: order.customer_name,
@@ -385,7 +385,7 @@ export function usePOSOrder() {
   const retrieveHeldOrder = useCallback(
     async (heldOrder: Order) => {
       if (currentOrder.items.length > 0) {
-        // Ask user if they want to replace current order
+        
         const confirmed = window.confirm(
           "This will replace your current order. Are you sure you want to continue?"
         );
@@ -393,14 +393,14 @@ export function usePOSOrder() {
       }
 
       try {
-        // Update order status to 'pending'
+        
         const result = await updateOrderStatusApi.execute({
           order_status: "pending",
         });
 
         if (result) {
           setCurrentOrder(heldOrder);
-          await loadHeldOrders(); // Refresh held orders list
+          await loadHeldOrders(); 
           showNotification("Order retrieved successfully", "success");
           return true;
         } else {
@@ -418,7 +418,7 @@ export function usePOSOrder() {
   const deleteHeldOrder = useCallback(
     async (orderId: number) => {
       try {
-        // Call delete API directly with the correct order ID
+        
         const response = await fetch(
           `${
             process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
@@ -432,7 +432,7 @@ export function usePOSOrder() {
         );
 
         if (response.ok) {
-          await loadHeldOrders(); // Refresh held orders list
+          await loadHeldOrders(); 
           showNotification("Held order deleted successfully", "success");
           return true;
         } else {
@@ -453,13 +453,13 @@ export function usePOSOrder() {
   }, [newOrder, showNotification]);
 
   return {
-    // State
+    
     currentOrder,
     heldOrders,
     notification,
     isProcessing,
 
-    // Actions
+    
     addItemToOrder,
     removeItemFromOrder,
     updateItemQuantity,
@@ -471,15 +471,15 @@ export function usePOSOrder() {
     newOrder,
     voidOrder,
 
-    // Held orders management
+    
     loadHeldOrders,
     retrieveHeldOrder,
     deleteHeldOrder,
 
-    // Utilities
+    
     showNotification,
 
-    // API states
+    
     createOrderLoading: createOrderApi.loading,
     createOrderError: createOrderApi.error,
   };

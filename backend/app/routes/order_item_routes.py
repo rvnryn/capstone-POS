@@ -6,8 +6,6 @@ from app.supabase import supabase
 
 router = APIRouter(prefix="/api/order-items", tags=["order-items"])
 
-
-# Pydantic models
 class OrderItemCreate(BaseModel):
     order_id: int
     item_name: str
@@ -34,13 +32,11 @@ class OrderItemResponse(BaseModel):
 
 @router.post("/", response_model=OrderItemResponse)
 async def create_order_item(item_data: OrderItemCreate):
-    """Create a new order item"""
     try:
-        # Insert order item
         item_insert = {
             "order_id": item_data.order_id,
             "item_name": item_data.item_name,
-            "price": item_data.unit_price,  # Database expects 'price' column
+            "price": item_data.unit_price,
             "unit_price": item_data.unit_price,
             "quantity": item_data.quantity,
             "total_price": item_data.total_price,
@@ -136,7 +132,6 @@ async def update_order_item(item_id: int, item_data: OrderItemUpdate):
 
 @router.delete("/{item_id}")
 async def delete_order_item(item_id: int):
-    """Delete an order item"""
     try:
         # Check if item exists
         check_result = (
@@ -171,10 +166,7 @@ async def delete_order_item(item_id: int):
 async def get_popular_items(
     limit: int = 10, date_from: Optional[str] = None, date_to: Optional[str] = None
 ):
-    """Get most popular menu items based on quantity sold"""
     try:
-        # This is a complex query, might need to be handled differently depending on your Supabase setup
-        # For now, we'll fetch all items and process in Python
 
         query = supabase.table("order_items").select("*, orders(created_at)")
 

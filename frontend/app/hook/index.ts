@@ -1,12 +1,8 @@
-// Main POS Hook - Combines all functionality
 export { usePOSOrder } from "./usePOSOrder";
 export type { OrderItem, Order, Notification } from "./usePOSOrder";
-
-// Modal Management Hook
 export { usePOSModals } from "./usePOSModals";
 export type { Modal, ConfirmationData } from "./usePOSModals";
 
-// API Hooks
 export {
   useApi,
   useCreateOrder,
@@ -17,11 +13,9 @@ export {
   useOrdersSummary,
 } from "./useApi";
 
-// Email Receipt Hook
 export { useEmailReceipt } from "./useEmailReceipt";
 export type { EmailConfig, ReceiptData } from "./useEmailReceipt";
 
-// Utility Hooks
 export {
   useClock,
   useCustomerInput,
@@ -33,7 +27,6 @@ export {
 } from "./usePOSUtils";
 export type { ClockState } from "./usePOSUtils";
 
-// Combined POS Hook for easy integration
 import { usePOSOrder } from "./usePOSOrder";
 import { usePOSModals } from "./usePOSModals";
 import { useEmailReceipt } from "./useEmailReceipt";
@@ -48,7 +41,6 @@ export interface POSConfig {
 }
 
 export function usePOS(config: POSConfig) {
-  // Core functionality hooks
   const orderManager = usePOSOrder();
   const modalManager = usePOSModals();
   const emailReceipt = useEmailReceipt(config.emailConfig);
@@ -56,16 +48,10 @@ export function usePOS(config: POSConfig) {
   const customerInput = useCustomerInput();
 
   return {
-    // Order management
     order: orderManager,
-
-    // Modal management
     modals: modalManager,
 
-    // Email receipt
     receipt: emailReceipt,
-
-    // Utilities
     clock,
     customerInput,
   };

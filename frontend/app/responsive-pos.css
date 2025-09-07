@@ -1,6 +1,6 @@
-/* Responsive POS System - Additional Utilities */
 
-/* Extra small breakpoint for very small devices */
+
+
 @media (min-width: 375px) {
   .xs\:flex-row {
     flex-direction: row;
@@ -41,7 +41,7 @@
   }
 }
 
-/* Line clamp utilities for text truncation */
+
 .line-clamp-2 {
   overflow: hidden;
   display: -webkit-box;
@@ -56,7 +56,7 @@
   -webkit-line-clamp: 3;
 }
 
-/* Hover scale utilities */
+
 .hover\:scale-102:hover {
   --tw-scale-x: 1.02;
   --tw-scale-y: 1.02;
@@ -65,22 +65,22 @@
     scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
-/* Touch-friendly interactions */
+
 @media (hover: none) and (pointer: coarse) {
   .hover\:scale-105:hover,
   .hover\:scale-102:hover {
     transform: none;
   }
 
-  /* Make buttons slightly larger on touch devices */
+ 
   button {
-    min-height: 44px; /* iOS recommended minimum touch target */
+    min-height: 44px;
   }
 }
 
-/* Landscape orientation adjustments */
+
 @media screen and (orientation: landscape) and (max-height: 500px) {
-  /* Reduce vertical spacing in landscape mode on small screens */
+ 
   .landscape-compact .space-y-4 > * + * {
     margin-top: 0.5rem;
   }
@@ -100,14 +100,14 @@
   }
 }
 
-/* High DPI display adjustments */
+
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .text-xs {
-    font-size: 0.8125rem; /* Slightly larger on high DPI */
+    font-size: 0.8125rem;
   }
 }
 
-/* Focus styles for accessibility */
+
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
@@ -115,12 +115,12 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
-/* Smooth scrolling for better UX */
+
 html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar for webkit browsers */
+
 .overflow-y-auto::-webkit-scrollbar {
   width: 8px;
 }
@@ -139,7 +139,7 @@ html {
   background: rgba(156, 163, 175, 0.8);
 }
 
-/* Print styles */
+
 @media print {
   .no-print {
     display: none !important;
@@ -150,7 +150,7 @@ html {
   }
 }
 
-/* Reduce motion for users who prefer it */
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -162,7 +162,7 @@ html {
   }
 }
 
-/* High contrast mode support */
+
 @media (prefers-contrast: high) {
   .bg-gray-800 {
     background-color: #000000;

@@ -3,14 +3,14 @@ import { useState, useEffect } from "react";
 import { usePOS, OrderItem, Order } from "./hook";
 
 export default function POS() {
-  // State for managing order numbers (hydration-safe)
+  
   const [orderNumbers, setOrderNumbers] = useState<Record<number, string>>({});
   const [isClient, setIsClient] = useState(false);
 
-  // Initialize client-side state
+  
   useEffect(() => {
     setIsClient(true);
-    // Load existing order mappings from localStorage
+    
     if (typeof window !== "undefined") {
       const orderMapping = JSON.parse(
         localStorage.getItem("orderMapping") || "{}"
@@ -19,27 +19,27 @@ export default function POS() {
     }
   }, []);
 
-  // Function to check and reset daily order counter at 7 AM
+  
   const checkDailyReset = () => {
     if (typeof window === "undefined") return;
 
     const now = new Date();
     const currentHour = now.getHours();
-    const currentDateString = now.toISOString().split("T")[0]; // YYYY-MM-DD format
+    const currentDateString = now.toISOString().split("T")[0]; 
 
-    // Get last reset date from localStorage
+    
     const lastResetDate = localStorage.getItem("lastOrderResetDate");
 
-    // Check if we need to reset (different date and current time is 7 AM or later)
+    
     const needsReset = lastResetDate !== currentDateString && currentHour >= 7;
 
     if (needsReset) {
-      // Reset order counter to 0 (so next order will be 001)
+      
       localStorage.setItem("orderCounter", "0");
       localStorage.setItem("orderMapping", "{}");
       localStorage.setItem("lastOrderResetDate", currentDateString);
 
-      // Clear the order numbers state
+      
       setOrderNumbers({});
 
       console.log(
@@ -48,30 +48,30 @@ export default function POS() {
     }
   };
 
-  // Check for daily reset on component mount and periodically
+  
   useEffect(() => {
     if (isClient) {
-      // Check immediately when component mounts
+      
       checkDailyReset();
 
-      // Set up interval to check every 30 minutes for the daily reset
+      
       const resetInterval = setInterval(checkDailyReset, 30 * 60 * 1000);
 
       return () => clearInterval(resetInterval);
     }
   }, [isClient]);
 
-  // Utility function to generate sequential order numbers (hydration-safe)
+  
   const getSequentialOrderNumber = (orderId?: number) => {
-    // For current orders in progress, show the next available order number
+    
     if (!orderId) {
       if (!isClient) {
-        return "001"; // Default during SSR
+        return "001"; 
       }
-      // Check for daily reset before showing order number
+      
       checkDailyReset();
 
-      // Show what the next order number would be
+      
       const currentCounter = parseInt(
         localStorage.getItem("orderCounter") || "0",
         10
@@ -80,20 +80,20 @@ export default function POS() {
       return String(nextCounter).padStart(3, "0");
     }
 
-    // During server-side rendering or before client hydration
+    
     if (!isClient) {
       return "001";
     }
 
-    // Check for daily reset before assigning new order numbers
+    
     checkDailyReset();
 
-    // If this order ID already has a sequential number, return it
+    
     if (orderNumbers[orderId]) {
       return orderNumbers[orderId];
     }
 
-    // Generate new sequential number
+    
     const currentCounter = parseInt(
       localStorage.getItem("orderCounter") || "0",
       10
@@ -101,7 +101,7 @@ export default function POS() {
     const nextCounter = currentCounter + 1;
     const sequentialNumber = String(nextCounter).padStart(3, "0");
 
-    // Store the mapping and update counter
+    
     const newOrderNumbers = { ...orderNumbers, [orderId]: sequentialNumber };
     setOrderNumbers(newOrderNumbers);
     localStorage.setItem("orderMapping", JSON.stringify(newOrderNumbers));
@@ -110,19 +110,19 @@ export default function POS() {
     return sequentialNumber;
   };
 
-  // Initialize the POS system with hooks
+  
   const pos = usePOS({
     emailConfig: {
-      serviceId: "service_7m4ex1k",
-      templateId: "template_g6hu7bb",
-      publicKey: "UBJFFO4Xb6aSN41Tm",
+      serviceId: process.env.NEXT_PUBLIC_EMAIL_SERVICE_ID!,
+      templateId: process.env.NEXT_PUBLIC_EMAIL_TEMPLATE_ID!,
+      publicKey: process.env.NEXT_PUBLIC_EMAIL_PUBLIC_KEY!,
     },
   });
 
-  // Local state for menu and category selection (since we're keeping menu hardcoded)
+  
   const [selectedCategory, setSelectedCategory] = useState("Rice Toppings");
 
-  // Confirmation modal state
+  
   const [confirmationModal, setConfirmationModal] = useState({
     isOpen: false,
     title: "",
@@ -425,7 +425,7 @@ export default function POS() {
     ],
   };
 
-  // Helper functions using hooks
+  
   const addToOrder = (item: { id: string; name: string; price: number }) => {
     console.log("Adding item to order:", item);
     pos.order.addItemToOrder({
@@ -435,7 +435,7 @@ export default function POS() {
     });
   };
 
-  // Confirmation helpers
+  
   const showConfirmation = (
     title: string,
     message: string,
@@ -474,7 +474,7 @@ export default function POS() {
 
   const updateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity <= 0) {
-      // Find the item to get its name for confirmation
+      
       const item = pos.order.currentOrder.items.find((item) => item.id === id);
       if (item) {
         showConfirmation(
@@ -521,7 +521,7 @@ export default function POS() {
       return;
     }
 
-    // For other payment methods, process immediately
+    
     await processPayment(paymentMethod);
   };
 
@@ -541,10 +541,10 @@ export default function POS() {
     );
 
     if (completedOrder) {
-      // Order was successfully completed
+      
       console.log("Order completed:", completedOrder);
 
-      // Open receipt selection modal after successful payment
+      
       pos.modals.openReceiptSelectionModal(completedOrder);
     }
   };
@@ -621,14 +621,14 @@ export default function POS() {
       pos.order.showNotification("Receipt sent successfully!", "success");
       pos.modals.closeEmailReceiptModal();
     } else {
-      // Show the specific error from the email service
+      
       const errorMessage = pos.receipt.sendError || "Failed to send email";
       pos.order.showNotification(errorMessage, "error");
     }
   };
 
   const handlePrintReceipt = (orderData: any) => {
-    pos.modals.openModal("printReceipt", orderData); // Open the correct print receipt modal
+    pos.modals.openModal("printReceipt", orderData); 
   };
 
   if (pos.modals.isModalOpen("printReceipt")) {
@@ -812,12 +812,12 @@ export default function POS() {
     showConfirmation(
       "DELETE HELD ORDER",
       `Permanently delete Order #${order.id} (${order.customer}) with ${order.items.length} items? This cannot be undone.`,
-      () => pos.order.deleteHeldOrder(order.id!), // Pass the actual order ID, not the array index
+      () => pos.order.deleteHeldOrder(order.id!), 
       "danger"
     );
   };
 
-  // Get menu items for selected category
+  
   const filteredMenuItems =
     menuItems[selectedCategory as keyof typeof menuItems] || [];
 

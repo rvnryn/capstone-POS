@@ -75,7 +75,7 @@ export function useCustomerInput() {
 export function useKeyboardShortcuts(callbacks: Record<string, () => void>) {
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      // Check for Ctrl/Cmd + key combinations
+      
       if (event.ctrlKey || event.metaKey) {
         const key = event.key.toLowerCase();
         if (callbacks[key]) {
@@ -84,7 +84,7 @@ export function useKeyboardShortcuts(callbacks: Record<string, () => void>) {
         }
       }
 
-      // Check for function keys
+      
       if (event.key.startsWith("F") && callbacks[event.key]) {
         event.preventDefault();
         callbacks[event.key]();

@@ -44,7 +44,6 @@ export function useApi<T = any>(
           },
         };
 
-        // Handle dynamic body (for parameterized requests)
         if (options.body) {
           config.body = JSON.stringify(
             typeof options.body === "function"
@@ -91,7 +90,6 @@ export function useApi<T = any>(
   };
 }
 
-// Specific API hooks for orders only
 export function useCreateOrder() {
   return useApi("/api/orders/", { method: "POST" });
 }
