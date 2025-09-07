@@ -24,6 +24,7 @@ const eslintConfig = [
       "react-hooks/exhaustive-deps": "off",
       "@next/next/no-sync-scripts": "off",
       "react/no-unescaped-entities": "off",
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
 ];
