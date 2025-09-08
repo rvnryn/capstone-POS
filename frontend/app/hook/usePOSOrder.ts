@@ -53,8 +53,13 @@ export function usePOSOrder() {
 
   const createOrderApi = useCreateOrder();
   const getHeldOrdersApi = useGetHeldOrders();
-  const updateOrderStatusApi = useUpdateOrderStatus(0);
-  const deleteOrderApi = useDeleteOrder(0);
+  // Only create these hooks when a valid order id is present
+  const updateOrderStatusApi = currentOrder.id
+    ? useUpdateOrderStatus(currentOrder.id)
+    : null;
+  const deleteOrderApi = currentOrder.id
+    ? useDeleteOrder(currentOrder.id)
+    : null;
 
   useEffect(() => {
     if (notification) {
@@ -386,7 +391,20 @@ export function usePOSOrder() {
       }
 
       try {
-        const result = await updateOrderStatusApi.execute({
+        if (!heldOrder.id) {
+          showNotification("No valid held order to retrieve.", "error");
+          return false;
+        }
+        // Debug: log endpoint and order id
+        const endpoint = `/api/orders-async/${heldOrder.id}/status`;
+        console.log(
+          "Retrieving held order. Endpoint:",
+          endpoint,
+          "Order ID:",
+          heldOrder.id
+        );
+        const heldOrderStatusApi = useUpdateOrderStatus(heldOrder.id);
+        const result = await heldOrderStatusApi.execute({
           order_status: "pending",
         });
 
@@ -404,7 +422,7 @@ export function usePOSOrder() {
         return false;
       }
     },
-    [currentOrder, updateOrderStatusApi, loadHeldOrders, showNotification]
+    [currentOrder, loadHeldOrders, showNotification]
   );
 
   const deleteHeldOrder = useCallback(

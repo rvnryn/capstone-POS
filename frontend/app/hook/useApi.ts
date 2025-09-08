@@ -91,7 +91,7 @@ export function useApi<T = any>(
 }
 
 export function useCreateOrder() {
-  return useApi("/api/orders/", { method: "POST" });
+  return useApi("/api/orders-async/", { method: "POST" });
 }
 
 export function useGetOrders(filters?: {
@@ -104,20 +104,20 @@ export function useGetOrders(filters?: {
   if (filters?.date_to) queryParams.append("date_to", filters.date_to);
   if (filters?.status) queryParams.append("status", filters.status);
 
-  const endpoint = `/api/orders/?${queryParams.toString()}`;
+  const endpoint = `/api/orders-async/?${queryParams.toString()}`;
   return useApi(endpoint, { method: "GET" });
 }
 
 export function useGetHeldOrders() {
-  return useApi("/api/orders/status/held", { method: "GET" });
+  return useApi("/api/orders-async/status/held", { method: "GET" });
 }
 
 export function useUpdateOrderStatus(orderId: number) {
-  return useApi(`/api/orders/${orderId}/status`, { method: "PUT" });
+  return useApi(`/api/orders-async/${orderId}/status`, { method: "PUT" });
 }
 
 export function useDeleteOrder(orderId: number) {
-  return useApi(`/api/orders/${orderId}`, { method: "DELETE" });
+  return useApi(`/api/orders-async/${orderId}`, { method: "DELETE" });
 }
 
 export function useOrdersSummary(filters?: {

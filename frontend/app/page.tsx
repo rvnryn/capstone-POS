@@ -3,14 +3,12 @@ import { useState, useEffect } from "react";
 import { usePOS, OrderItem, Order } from "./hook";
 
 export default function POS() {
-  
   const [orderNumbers, setOrderNumbers] = useState<Record<number, string>>({});
   const [isClient, setIsClient] = useState(false);
 
-  
   useEffect(() => {
     setIsClient(true);
-    
+
     if (typeof window !== "undefined") {
       const orderMapping = JSON.parse(
         localStorage.getItem("orderMapping") || "{}"
@@ -19,27 +17,22 @@ export default function POS() {
     }
   }, []);
 
-  
   const checkDailyReset = () => {
     if (typeof window === "undefined") return;
 
     const now = new Date();
     const currentHour = now.getHours();
-    const currentDateString = now.toISOString().split("T")[0]; 
+    const currentDateString = now.toISOString().split("T")[0];
 
-    
     const lastResetDate = localStorage.getItem("lastOrderResetDate");
 
-    
     const needsReset = lastResetDate !== currentDateString && currentHour >= 7;
 
     if (needsReset) {
-      
       localStorage.setItem("orderCounter", "0");
       localStorage.setItem("orderMapping", "{}");
       localStorage.setItem("lastOrderResetDate", currentDateString);
 
-      
       setOrderNumbers({});
 
       console.log(
@@ -48,30 +41,24 @@ export default function POS() {
     }
   };
 
-  
   useEffect(() => {
     if (isClient) {
-      
       checkDailyReset();
 
-      
       const resetInterval = setInterval(checkDailyReset, 30 * 60 * 1000);
 
       return () => clearInterval(resetInterval);
     }
   }, [isClient]);
 
-  
   const getSequentialOrderNumber = (orderId?: number) => {
-    
     if (!orderId) {
       if (!isClient) {
-        return "001"; 
+        return "001";
       }
-      
+
       checkDailyReset();
 
-      
       const currentCounter = parseInt(
         localStorage.getItem("orderCounter") || "0",
         10
@@ -80,20 +67,16 @@ export default function POS() {
       return String(nextCounter).padStart(3, "0");
     }
 
-    
     if (!isClient) {
       return "001";
     }
 
-    
     checkDailyReset();
 
-    
     if (orderNumbers[orderId]) {
       return orderNumbers[orderId];
     }
 
-    
     const currentCounter = parseInt(
       localStorage.getItem("orderCounter") || "0",
       10
@@ -101,7 +84,6 @@ export default function POS() {
     const nextCounter = currentCounter + 1;
     const sequentialNumber = String(nextCounter).padStart(3, "0");
 
-    
     const newOrderNumbers = { ...orderNumbers, [orderId]: sequentialNumber };
     setOrderNumbers(newOrderNumbers);
     localStorage.setItem("orderMapping", JSON.stringify(newOrderNumbers));
@@ -110,7 +92,7 @@ export default function POS() {
     return sequentialNumber;
   };
 
-  
+  // POS hooks now use the new async backend endpoints for much faster order/payment processing
   const pos = usePOS({
     emailConfig: {
       serviceId: process.env.NEXT_PUBLIC_EMAIL_SERVICE_ID!,
@@ -119,10 +101,8 @@ export default function POS() {
     },
   });
 
-  
   const [selectedCategory, setSelectedCategory] = useState("Rice Toppings");
 
-  
   const [confirmationModal, setConfirmationModal] = useState({
     isOpen: false,
     title: "",
@@ -425,7 +405,6 @@ export default function POS() {
     ],
   };
 
-  
   const addToOrder = (item: { id: string; name: string; price: number }) => {
     console.log("Adding item to order:", item);
     pos.order.addItemToOrder({
@@ -435,7 +414,6 @@ export default function POS() {
     });
   };
 
-  
   const showConfirmation = (
     title: string,
     message: string,
@@ -474,7 +452,6 @@ export default function POS() {
 
   const updateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity <= 0) {
-      
       const item = pos.order.currentOrder.items.find((item) => item.id === id);
       if (item) {
         showConfirmation(
@@ -499,9 +476,9 @@ export default function POS() {
     }
     showConfirmation(
       "PROCESS PAYMENT",
-      `Process payment for ₱${pos.order.currentOrder.total.toFixed(2)} with ${
-        pos.order.currentOrder.items.length
-      } items?`,
+      `Process payment for ₱${(pos.order.currentOrder.total ?? 0).toFixed(
+        2
+      )} with ${pos.order.currentOrder.items.length} items?`,
       () => pos.modals.openPaymentModal(),
       "default"
     );
@@ -521,7 +498,6 @@ export default function POS() {
       return;
     }
 
-    
     await processPayment(paymentMethod);
   };
 
@@ -541,10 +517,8 @@ export default function POS() {
     );
 
     if (completedOrder) {
-      
       console.log("Order completed:", completedOrder);
 
-      
       pos.modals.openReceiptSelectionModal(completedOrder);
     }
   };
@@ -578,13 +552,16 @@ export default function POS() {
 
     const change = amount - total;
     if (change > 0) {
-      pos.order.showNotification(`Change: ₱${change.toFixed(2)}`, "success");
+      pos.order.showNotification(
+        `Change: ₱${(change ?? 0).toFixed(2)}`,
+        "success"
+      );
     }
 
     pos.modals.closeCashPaymentModal();
     await processPayment(
       "cash",
-      `₱${amount.toFixed(2)} received`,
+      `₱${(amount ?? 0).toFixed(2)} received`,
       amount,
       change
     );
@@ -621,14 +598,13 @@ export default function POS() {
       pos.order.showNotification("Receipt sent successfully!", "success");
       pos.modals.closeEmailReceiptModal();
     } else {
-      
       const errorMessage = pos.receipt.sendError || "Failed to send email";
       pos.order.showNotification(errorMessage, "error");
     }
   };
 
   const handlePrintReceipt = (orderData: any) => {
-    pos.modals.openModal("printReceipt", orderData); 
+    pos.modals.openModal("printReceipt", orderData);
   };
 
   if (pos.modals.isModalOpen("printReceipt")) {
@@ -672,7 +648,9 @@ export default function POS() {
                   <span className="text-black">
                     {item.quantity}x {item.name}
                   </span>
-                  <span className="text-black">₱{item.total.toFixed(2)}</span>
+                  <span className="text-black">
+                    ₱{(item.total ?? 0).toFixed(2)}
+                  </span>
                 </div>
               ))}
             </div>
@@ -682,25 +660,27 @@ export default function POS() {
             <div className="flex justify-between">
               <span className="text-black">Subtotal</span>
               <span className="text-black">
-                ₱{orderData?.subtotal?.toFixed(2)}
+                ₱{(orderData?.subtotal ?? 0).toFixed(2)}
               </span>
             </div>
             <div className="flex justify-between">
               <span>VAT (incl.)</span>
-              <span className="text-black">₱{orderData?.vat?.toFixed(2)}</span>
+              <span className="text-black">
+                ₱{(orderData?.vat ?? 0).toFixed(2)}
+              </span>
             </div>
             {orderData?.discount > 0 && (
               <div className="flex justify-between text-red-500">
                 <span>Discount</span>
                 <span className="text-black">
-                  -₱{orderData?.discount?.toFixed(2)}
+                  -₱{(orderData?.discount ?? 0).toFixed(2)}
                 </span>
               </div>
             )}
             <div className="flex justify-between font-bold border-t border-gray-400 mt-2 pt-1 text-base text-black">
               <span>Total</span>
               <span className="text-black">
-                ₱{orderData?.total?.toFixed(2)}
+                ₱{(orderData?.total ?? 0).toFixed(2)}
               </span>
             </div>
           </div>
@@ -812,12 +792,11 @@ export default function POS() {
     showConfirmation(
       "DELETE HELD ORDER",
       `Permanently delete Order #${order.id} (${order.customer}) with ${order.items.length} items? This cannot be undone.`,
-      () => pos.order.deleteHeldOrder(order.id!), 
+      () => pos.order.deleteHeldOrder(order.id!),
       "danger"
     );
   };
 
-  
   const filteredMenuItems =
     menuItems[selectedCategory as keyof typeof menuItems] || [];
 
@@ -981,13 +960,13 @@ export default function POS() {
             </div>
             <div className="border border-yellow-400/30 bg-slate-800/30 p-1 sm:p-2">
               <div className="text-yellow-400 font-bold text-sm sm:text-lg">
-                ₱{pos.order.currentOrder.subtotal.toFixed(0)}
+                ₱{(pos.order.currentOrder.subtotal ?? 0).toFixed(0)}
               </div>
               <div className="text-yellow-400/80 text-xs">SUB</div>
             </div>
             <div className="border border-yellow-400/30 bg-slate-800/30 p-1 sm:p-2">
               <div className="text-yellow-400 font-bold text-sm sm:text-lg">
-                ₱{pos.order.currentOrder.total.toFixed(0)}
+                ₱{(pos.order.currentOrder.total ?? 0).toFixed(0)}
               </div>
               <div className="text-yellow-400/80 text-xs">TOTAL</div>
             </div>
@@ -1064,12 +1043,12 @@ export default function POS() {
 
                     {/* Unit Price */}
                     <div className="text-yellow-400 text-xs w-12 text-center">
-                      ₱{item.price.toFixed(0)}
+                      ₱{(item.price ?? 0).toFixed(0)}
                     </div>
 
                     {/* Total Price */}
                     <div className="text-yellow-400 font-bold text-sm w-16 text-center">
-                      ₱{item.total.toFixed(2)}
+                      ₱{(item.total ?? 0).toFixed(2)}
                     </div>
 
                     {/* Remove Button */}
@@ -1098,20 +1077,20 @@ export default function POS() {
               <div className="flex justify-between">
                 <span className="text-yellow-400">SUBTOTAL:</span>
                 <span className="text-yellow-400 font-bold">
-                  ₱{pos.order.currentOrder.subtotal.toFixed(2)}
+                  ₱{(pos.order.currentOrder.subtotal ?? 0).toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-yellow-400">VAT (Included):</span>
                 <span className="text-yellow-400 font-bold">
-                  ₱{pos.order.currentOrder.vat.toFixed(2)}
+                  ₱{(pos.order.currentOrder.vat ?? 0).toFixed(2)}
                 </span>
               </div>
               {pos.order.currentOrder.discount > 0 && (
                 <div className="flex justify-between">
                   <span className="text-yellow-400">DISCOUNT:</span>
                   <span className="text-red-400 font-bold">
-                    -₱{pos.order.currentOrder.discount.toFixed(2)}
+                    -₱{(pos.order.currentOrder.discount ?? 0).toFixed(2)}
                   </span>
                 </div>
               )}
@@ -1119,7 +1098,7 @@ export default function POS() {
                 <div className="flex justify-between">
                   <span className="text-yellow-400 font-bold">TOTAL DUE:</span>
                   <span className="text-yellow-400 font-bold text-lg">
-                    ₱{pos.order.currentOrder.total.toFixed(2)}
+                    ₱{(pos.order.currentOrder.total ?? 0).toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -1331,7 +1310,7 @@ export default function POS() {
                       <div className="border-t border-yellow-400/30 pt-1 sm:pt-2 md:pt-3 mt-1 sm:mt-2 md:mt-3">
                         <div className="text-center">
                           <div className="text-lg sm:text-xl md:text-2xl font-bold text-yellow-400">
-                            ₱{item.price.toFixed(2)}
+                            ₱{(item.price ?? 0).toFixed(2)}
                           </div>
                           <div className="text-xs sm:text-sm text-yellow-400/80">
                             UNIT PRICE
@@ -1404,7 +1383,7 @@ export default function POS() {
               <div className="text-white">
                 <div className="text-sm sm:text-base">TOTAL AMOUNT DUE:</div>
                 <div className="text-white font-bold text-lg sm:text-xl md:text-2xl">
-                  ₱{pos.order.currentOrder.total.toFixed(2)}
+                  ₱{(pos.order.currentOrder.total ?? 0).toFixed(2)}
                 </div>
               </div>
             </div>
@@ -1495,7 +1474,7 @@ export default function POS() {
               <div className="flex justify-between items-center text-sm sm:text-base">
                 <span className="text-gray-300">Total Amount:</span>
                 <span className="text-green-400 font-bold">
-                  ₱{pos.order.currentOrder.total.toFixed(2)}
+                  ₱{(pos.order.currentOrder.total ?? 0).toFixed(2)}
                 </span>
               </div>
             </div>
@@ -1517,7 +1496,8 @@ export default function POS() {
                 <div className="flex justify-between items-center text-sm sm:text-base mb-2">
                   <span className="text-gray-300">Amount Received:</span>
                   <span className="text-blue-400 font-bold">
-                    ₱{parseFloat(pos.modals.cashAmount || "0").toFixed(2)}
+                    ₱
+                    {(parseFloat(pos.modals.cashAmount || "0") ?? 0).toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-sm sm:text-base">
@@ -1535,7 +1515,7 @@ export default function POS() {
                       0,
                       parseFloat(pos.modals.cashAmount || "0") -
                         pos.order.currentOrder.total
-                    ).toFixed(2)}
+                    )?.toFixed(2)}
                   </span>
                 </div>
                 {parseFloat(pos.modals.cashAmount || "0") <
