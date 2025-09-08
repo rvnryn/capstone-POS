@@ -412,8 +412,7 @@ export function usePOSOrder() {
       try {
         const response = await fetch(
           `${
-            process.env.NEXT_PUBLIC_API_BASE_URL ||
-            "https://capstone-pos-3vbj.vercel.app"
+            process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
           }/api/orders/${orderId}`,
           {
             method: "DELETE",
