@@ -15,7 +15,7 @@ export interface OrderItem {
 }
 
 export interface Order {
-  id?: number; 
+  id?: number;
   customer: string;
   type: string;
   items: OrderItem[];
@@ -36,7 +36,7 @@ export interface Notification {
 
 export function usePOSOrder() {
   const [currentOrder, setCurrentOrder] = useState<Order>({
-    id: undefined, 
+    id: undefined,
     customer: "Walk-in Customer",
     type: "Dining",
     items: [],
@@ -53,10 +53,9 @@ export function usePOSOrder() {
 
   const createOrderApi = useCreateOrder();
   const getHeldOrdersApi = useGetHeldOrders();
-  const updateOrderStatusApi = useUpdateOrderStatus(0); 
-  const deleteOrderApi = useDeleteOrder(0); 
+  const updateOrderStatusApi = useUpdateOrderStatus(0);
+  const deleteOrderApi = useDeleteOrder(0);
 
-  
   useEffect(() => {
     if (notification) {
       const timer = setTimeout(() => setNotification(null), 3000);
@@ -64,7 +63,6 @@ export function usePOSOrder() {
     }
   }, [notification]);
 
-  
   useEffect(() => {
     const initializeHeldOrders = async () => {
       try {
@@ -98,7 +96,7 @@ export function usePOSOrder() {
     };
 
     initializeHeldOrders();
-  }, []); 
+  }, []);
 
   const showNotification = useCallback(
     (message: string, type: Notification["type"] = "info") => {
@@ -116,7 +114,6 @@ export function usePOSOrder() {
 
         let newItems;
         if (existingItemIndex >= 0) {
-          
           newItems = prev.items.map((orderItem, index) => {
             if (index === existingItemIndex) {
               const newQuantity = orderItem.quantity + item.quantity;
@@ -129,7 +126,6 @@ export function usePOSOrder() {
             return orderItem;
           });
         } else {
-          
           const newItem: OrderItem = {
             ...item,
             id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
@@ -142,7 +138,7 @@ export function usePOSOrder() {
           (sum, orderItem) => sum + orderItem.total,
           0
         );
-        const vat = subtotal * 0.12; 
+        const vat = subtotal * 0.12;
         const total = subtotal + vat - prev.discount;
 
         return {
@@ -215,7 +211,7 @@ export function usePOSOrder() {
       return {
         ...prev,
         discount: discountAmount,
-        total: Math.max(0, total), 
+        total: Math.max(0, total),
       };
     });
   }, []);
@@ -296,7 +292,6 @@ export function usePOSOrder() {
       setIsProcessing(true);
 
       try {
-        
         const orderData = {
           customer_name: currentOrder.customer,
           order_type: currentOrder.type,
@@ -342,7 +337,7 @@ export function usePOSOrder() {
 
   const newOrder = useCallback(() => {
     setCurrentOrder({
-      id: undefined, 
+      id: undefined,
       customer: "Walk-in Customer",
       type: "Dining",
       items: [],
@@ -357,7 +352,6 @@ export function usePOSOrder() {
   const loadHeldOrders = useCallback(async () => {
     const result = await getHeldOrdersApi.execute();
     if (result) {
-      
       const transformedOrders = result.map((order: any) => ({
         id: order.order_id,
         customer: order.customer_name,
@@ -385,7 +379,6 @@ export function usePOSOrder() {
   const retrieveHeldOrder = useCallback(
     async (heldOrder: Order) => {
       if (currentOrder.items.length > 0) {
-        
         const confirmed = window.confirm(
           "This will replace your current order. Are you sure you want to continue?"
         );
@@ -393,14 +386,13 @@ export function usePOSOrder() {
       }
 
       try {
-        
         const result = await updateOrderStatusApi.execute({
           order_status: "pending",
         });
 
         if (result) {
           setCurrentOrder(heldOrder);
-          await loadHeldOrders(); 
+          await loadHeldOrders();
           showNotification("Order retrieved successfully", "success");
           return true;
         } else {
@@ -418,10 +410,10 @@ export function usePOSOrder() {
   const deleteHeldOrder = useCallback(
     async (orderId: number) => {
       try {
-        
         const response = await fetch(
           `${
-            process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
+            process.env.NEXT_PUBLIC_API_BASE_URL ||
+            "https://capstone-pos-3vbj.vercel.app"
           }/api/orders/${orderId}`,
           {
             method: "DELETE",
@@ -432,7 +424,7 @@ export function usePOSOrder() {
         );
 
         if (response.ok) {
-          await loadHeldOrders(); 
+          await loadHeldOrders();
           showNotification("Held order deleted successfully", "success");
           return true;
         } else {
@@ -453,13 +445,11 @@ export function usePOSOrder() {
   }, [newOrder, showNotification]);
 
   return {
-    
     currentOrder,
     heldOrders,
     notification,
     isProcessing,
 
-    
     addItemToOrder,
     removeItemFromOrder,
     updateItemQuantity,
@@ -471,15 +461,12 @@ export function usePOSOrder() {
     newOrder,
     voidOrder,
 
-    
     loadHeldOrders,
     retrieveHeldOrder,
     deleteHeldOrder,
 
-    
     showNotification,
 
-    
     createOrderLoading: createOrderApi.loading,
     createOrderError: createOrderApi.error,
   };

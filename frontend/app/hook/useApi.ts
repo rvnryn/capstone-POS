@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://capstone-pos-3vbj.vercel.app";
 
 interface ApiState<T> {
   data: T | null;
