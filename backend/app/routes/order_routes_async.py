@@ -1,4 +1,8 @@
+from pydantic import BaseModel
 from datetime import datetime
+
+
+router = APIRouter(prefix="/api/orders-async", tags=["orders-async"])
 
 
 class OrderStatusUpdate(BaseModel):
@@ -26,13 +30,6 @@ async def update_order_status_async(
         )
 
 
-from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from sqlalchemy.orm import joinedload
-from app.models.order import Order, OrderItem
-from app.supabase import get_db
-from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
