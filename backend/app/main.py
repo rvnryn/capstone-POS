@@ -21,7 +21,10 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 # CORS middleware setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://capstone-pos-3vbj.vercel.app"],
+    allow_origins=[
+        "https://capstone-pos.vercel.app",
+        "http://localhost:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
