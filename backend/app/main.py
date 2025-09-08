@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Import the route modules
 from .routes import order_router, order_item_router
-from app.routes.order_routes_async import router as order_router_async
+
 
 app = FastAPI()
 
@@ -32,9 +32,8 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(order_router)
 app.include_router(order_item_router)
-app.include_router(order_router_async)
+app.include_router(order_router)
 
 
 @app.get("/health")
