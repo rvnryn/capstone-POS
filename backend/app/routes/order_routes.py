@@ -30,6 +30,7 @@ class OrderCreate(BaseModel):
     order_type: str = "Dining"
     discount: float = 0.0
     vat: float
+    subtotal: float  # <-- Add this line
     total_amount: float
     payment_method: Optional[str] = None
     payment_reference: Optional[str] = None
