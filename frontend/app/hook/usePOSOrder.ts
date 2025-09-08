@@ -53,13 +53,9 @@ export function usePOSOrder() {
 
   const createOrderApi = useCreateOrder();
   const getHeldOrdersApi = useGetHeldOrders();
-  // Only create these hooks when a valid order id is present
-  const updateOrderStatusApi = currentOrder.id
-    ? useUpdateOrderStatus(currentOrder.id)
-    : null;
-  const deleteOrderApi = currentOrder.id
-    ? useDeleteOrder(currentOrder.id)
-    : null;
+  // Always call hooks at the top level, use as functions for specific IDs
+  const getUpdateOrderStatusApi = useUpdateOrderStatus;
+  const getDeleteOrderApi = useDeleteOrder;
 
   useEffect(() => {
     if (notification) {
@@ -403,7 +399,7 @@ export function usePOSOrder() {
           "Order ID:",
           heldOrder.id
         );
-        const heldOrderStatusApi = useUpdateOrderStatus(heldOrder.id);
+        const heldOrderStatusApi = getUpdateOrderStatusApi(heldOrder.id);
         const result = await heldOrderStatusApi.execute({
           order_status: "pending",
         });
@@ -453,7 +449,7 @@ export function usePOSOrder() {
         return false;
       }
     },
-    [deleteOrderApi, loadHeldOrders, showNotification]
+  [getDeleteOrderApi, loadHeldOrders, showNotification]
   );
 
   const voidOrder = useCallback(() => {
