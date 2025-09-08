@@ -427,7 +427,7 @@ export function usePOSOrder() {
         const response = await fetch(
           `${
             process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-          }/api/orders/${orderId}`,
+          }/api/orders-async/${orderId}`,
           {
             method: "DELETE",
             headers: {

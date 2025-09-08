@@ -128,6 +128,6 @@ export function useOrdersSummary(filters?: {
   if (filters?.date_from) queryParams.append("date_from", filters.date_from);
   if (filters?.date_to) queryParams.append("date_to", filters.date_to);
 
-  const endpoint = `/api/orders/summary?${queryParams.toString()}`;
+  const endpoint = `/api/orders-async/today/summary?${queryParams.toString()}`;
   return useApi(endpoint, { method: "GET" });
 }
