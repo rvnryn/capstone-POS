@@ -449,7 +449,7 @@ export function usePOSOrder() {
         return false;
       }
     },
-  [getDeleteOrderApi, loadHeldOrders, showNotification]
+    [getDeleteOrderApi, loadHeldOrders, showNotification]
   );
 
   const voidOrder = useCallback(() => {
