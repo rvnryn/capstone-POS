@@ -1,6 +1,13 @@
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from datetime import datetime
-
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import joinedload
+from app.models.order import Order, OrderItem
+from app.supabase import get_db
+from typing import List
+from typing import List
 
 router = APIRouter(prefix="/api/orders-async", tags=["orders-async"])
 
@@ -28,20 +35,6 @@ async def update_order_status_async(
         raise HTTPException(
             status_code=500, detail=f"Failed to update order status: {str(e)}"
         )
-
-
-from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from sqlalchemy.orm import joinedload
-from app.models.order import Order, OrderItem
-from app.supabase import get_db
-from typing import List
-from datetime import datetime
-from pydantic import BaseModel
-from typing import List
-
-router = APIRouter(prefix="/api/orders-async", tags=["orders-async"])
 
 
 class OrderItemCreate(BaseModel):
