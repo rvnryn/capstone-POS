@@ -54,7 +54,9 @@ export function usePOSOrder() {
   const createOrderApi = useCreateOrder();
   const getHeldOrdersApi = useGetHeldOrders();
   // Always call hooks at the top level, use as functions for specific IDs
-  const getUpdateOrderStatusApi = useUpdateOrderStatus;
+  // Use a single updateOrderStatusApi instance with a dynamic orderId
+  const [updateOrderId, setUpdateOrderId] = useState<number | null>(null);
+  const updateOrderStatusApi = useUpdateOrderStatus(updateOrderId ?? 0);
   const getDeleteOrderApi = useDeleteOrder;
 
   useEffect(() => {
@@ -386,24 +388,22 @@ export function usePOSOrder() {
         if (!confirmed) return false;
       }
 
+      if (!heldOrder.id || heldOrder.id <= 0 || isNaN(Number(heldOrder.id))) {
+        showNotification("No valid held order to retrieve.", "error");
+        return false;
+      }
+      setUpdateOrderId(heldOrder.id);
       try {
-        if (!heldOrder.id) {
-          showNotification("No valid held order to retrieve.", "error");
-          return false;
-        }
-        // Debug: log endpoint and order id
-        const endpoint = `/api/orders-async/${heldOrder.id}/status`;
+        const payload = { order_status: "pending" };
         console.log(
-          "Retrieving held order. Endpoint:",
-          endpoint,
-          "Order ID:",
-          heldOrder.id
+          "[retrieveHeldOrder] Calling: /api/orders-async/" +
+            heldOrder.id +
+            "/status",
+          "Payload:",
+          payload
         );
-        const heldOrderStatusApi = getUpdateOrderStatusApi(heldOrder.id);
-        const result = await heldOrderStatusApi.execute({
-          order_status: "pending",
-        });
-
+        const result = await updateOrderStatusApi.execute(payload);
+        console.log("[retrieveHeldOrder] Result:", result);
         if (result) {
           setCurrentOrder(heldOrder);
           await loadHeldOrders();
@@ -414,11 +414,12 @@ export function usePOSOrder() {
           return false;
         }
       } catch (error) {
+        console.error("[retrieveHeldOrder] Error:", error);
         showNotification("Error retrieving order", "error");
         return false;
       }
     },
-    [currentOrder, loadHeldOrders, showNotification]
+    [currentOrder, loadHeldOrders, showNotification, updateOrderStatusApi]
   );
 
   const deleteHeldOrder = useCallback(

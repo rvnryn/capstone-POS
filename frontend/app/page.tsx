@@ -865,9 +865,6 @@ export default function POS() {
             <span className="hidden sm:inline">◆ CASHIER TERMINAL ◆</span>
             <span className="sm:hidden">◆ POS ◆</span>
             <span className="hidden md:inline">READY</span>
-            <span className="text-xs sm:text-sm">
-              {formatTime(pos.clock.currentTime)}
-            </span>
           </div>
         </div>
 
@@ -935,8 +932,9 @@ export default function POS() {
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-yellow-400">TIME:</span>
+              <span className="text-yellow-400">DATE & TIME:</span>
               <span className="text-yellow-400 font-bold">
+                {pos.clock.currentTime.toLocaleDateString()} |{" "}
                 {formatTime(pos.clock.currentTime)}
               </span>
             </div>
