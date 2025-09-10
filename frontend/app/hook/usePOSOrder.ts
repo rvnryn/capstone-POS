@@ -53,10 +53,6 @@ export function usePOSOrder() {
 
   const createOrderApi = useCreateOrder();
   const getHeldOrdersApi = useGetHeldOrders();
-  // Always call hooks at the top level, use as functions for specific IDs
-  // Use a single updateOrderStatusApi instance with a dynamic orderId
-  const [updateOrderId, setUpdateOrderId] = useState<number | null>(null);
-  const updateOrderStatusApi = useUpdateOrderStatus(updateOrderId ?? 0);
   const getDeleteOrderApi = useDeleteOrder;
 
   useEffect(() => {
@@ -69,28 +65,46 @@ export function usePOSOrder() {
   useEffect(() => {
     const initializeHeldOrders = async () => {
       try {
+        console.log("[initializeHeldOrders] Loading held orders...");
         const result = await getHeldOrdersApi.execute();
+        console.log("[initializeHeldOrders] Raw API result:", result);
+
         if (result && Array.isArray(result)) {
-          const transformedOrders = result.map((order: any) => ({
-            id: order.order_id,
-            customer: order.customer_name,
-            type: order.order_type,
-            items:
-              order.order_items?.map((item: any) => ({
-                id: item.order_item_id.toString(),
-                name: item.item_name,
-                price: item.unit_price,
-                quantity: item.quantity,
-                total: item.total_price,
-              })) || [],
-            subtotal: order.subtotal,
-            discount: order.discount,
-            vat: order.vat,
-            total: order.total_amount,
-            notes: order.customer_notes || "",
-            heldAt: order.created_at,
-            order_status: order.order_status,
-          }));
+          const transformedOrders = result.map((order: any, index: number) => {
+            console.log(
+              `[initializeHeldOrders] Processing order ${index}:`,
+              order
+            );
+            const transformed = {
+              id: order.order_id,
+              customer: order.customer_name,
+              type: order.order_type,
+              items:
+                order.order_items?.map((item: any) => ({
+                  id: item.order_item_id.toString(),
+                  name: item.item_name,
+                  price: item.unit_price,
+                  quantity: item.quantity,
+                  total: item.total_price,
+                })) || [],
+              subtotal: order.subtotal,
+              discount: order.discount,
+              vat: order.vat,
+              total: order.total_amount,
+              notes: order.customer_notes || "",
+              heldAt: order.created_at,
+              order_status: order.order_status,
+            };
+            console.log(
+              `[initializeHeldOrders] Transformed order ${index}:`,
+              transformed
+            );
+            return transformed;
+          });
+          console.log(
+            "[initializeHeldOrders] All transformed orders:",
+            transformedOrders
+          );
           setHeldOrders(transformedOrders);
         }
       } catch (error) {
@@ -353,28 +367,43 @@ export function usePOSOrder() {
   }, []);
 
   const loadHeldOrders = useCallback(async () => {
+    console.log("[loadHeldOrders] Refreshing held orders...");
     const result = await getHeldOrdersApi.execute();
+    console.log("[loadHeldOrders] Raw API result:", result);
+
     if (result) {
-      const transformedOrders = result.map((order: any) => ({
-        id: order.order_id,
-        customer: order.customer_name,
-        type: order.order_type,
-        items:
-          order.order_items?.map((item: any) => ({
-            id: item.order_item_id.toString(),
-            name: item.item_name,
-            quantity: item.quantity,
-            price: item.unit_price,
-            total: item.total_price,
-          })) || [],
-        subtotal: order.subtotal,
-        discount: order.discount || 0,
-        vat: order.vat,
-        total: order.total,
-        notes: order.notes || "",
-        heldAt: order.created_at,
-        order_status: order.order_status,
-      }));
+      const transformedOrders = result.map((order: any, index: number) => {
+        console.log(`[loadHeldOrders] Processing order ${index}:`, order);
+        const transformed = {
+          id: order.order_id,
+          customer: order.customer_name,
+          type: order.order_type,
+          items:
+            order.order_items?.map((item: any) => ({
+              id: item.order_item_id.toString(),
+              name: item.item_name,
+              quantity: item.quantity,
+              price: item.unit_price,
+              total: item.total_price,
+            })) || [],
+          subtotal: order.subtotal,
+          discount: order.discount || 0,
+          vat: order.vat,
+          total: order.total_amount,
+          notes: order.customer_notes || "",
+          heldAt: order.created_at,
+          order_status: order.order_status,
+        };
+        console.log(
+          `[loadHeldOrders] Transformed order ${index}:`,
+          transformed
+        );
+        return transformed;
+      });
+      console.log(
+        "[loadHeldOrders] All transformed orders:",
+        transformedOrders
+      );
       setHeldOrders(transformedOrders);
     }
   }, [getHeldOrdersApi]);
@@ -388,38 +417,58 @@ export function usePOSOrder() {
         if (!confirmed) return false;
       }
 
+      console.log("[retrieveHeldOrder] Input heldOrder:", heldOrder);
+
       if (!heldOrder.id || heldOrder.id <= 0 || isNaN(Number(heldOrder.id))) {
-        showNotification("No valid held order to retrieve.", "error");
+        console.error("[retrieveHeldOrder] Invalid order ID:", heldOrder.id);
+        showNotification("Invalid order ID. Cannot retrieve order.", "error");
         return false;
       }
-      setUpdateOrderId(heldOrder.id);
+
       try {
         const payload = { order_status: "pending" };
-        console.log(
-          "[retrieveHeldOrder] Calling: /api/orders-async/" +
-            heldOrder.id +
-            "/status",
-          "Payload:",
-          payload
-        );
-        const result = await updateOrderStatusApi.execute(payload);
-        console.log("[retrieveHeldOrder] Result:", result);
-        if (result) {
+        const url = `${
+          process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
+        }/api/orders-async/${heldOrder.id}/status`;
+
+        console.log("[retrieveHeldOrder] URL:", url);
+        console.log("[retrieveHeldOrder] Payload:", payload);
+
+        const response = await fetch(url, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        console.log("[retrieveHeldOrder] Response status:", response.status);
+        console.log("[retrieveHeldOrder] Response ok:", response.ok);
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log("[retrieveHeldOrder] Success result:", result);
           setCurrentOrder(heldOrder);
           await loadHeldOrders();
           showNotification("Order retrieved successfully", "success");
           return true;
         } else {
-          showNotification("Failed to retrieve order", "error");
+          const errorData = await response.json().catch(() => ({}));
+          console.error("[retrieveHeldOrder] Error response:", errorData);
+          showNotification(
+            errorData.detail ||
+              `Failed to retrieve order (Status: ${response.status})`,
+            "error"
+          );
           return false;
         }
       } catch (error) {
-        console.error("[retrieveHeldOrder] Error:", error);
+        console.error("[retrieveHeldOrder] Network/Parse error:", error);
         showNotification("Error retrieving order", "error");
         return false;
       }
     },
-    [currentOrder, loadHeldOrders, showNotification, updateOrderStatusApi]
+    [currentOrder, loadHeldOrders, showNotification]
   );
 
   const deleteHeldOrder = useCallback(
@@ -453,10 +502,106 @@ export function usePOSOrder() {
     [getDeleteOrderApi, loadHeldOrders, showNotification]
   );
 
-  const voidOrder = useCallback(() => {
+  const voidOrder = useCallback(async () => {
+    const orderId = currentOrder.id;
+
+    console.log("[voidOrder] ================================");
+    console.log("[voidOrder] Starting void operation");
+    console.log(
+      "[voidOrder] Current order full object:",
+      JSON.stringify(currentOrder, null, 2)
+    );
+    console.log("[voidOrder] Order ID:", orderId);
+    console.log("[voidOrder] Order ID type:", typeof orderId);
+    console.log("[voidOrder] Order status:", currentOrder.order_status);
+    console.log("[voidOrder] ================================"); // If this is a retrieved held order (has an ID), mark it as canceled in the database
+    if (orderId && orderId > 0) {
+      try {
+        const url = `${
+          process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
+        }/api/orders-async/${orderId}/cancel`;
+
+        console.log("[voidOrder] Making cancel request to:", url);
+        console.log(
+          "[voidOrder] API Base URL:",
+          process.env.NEXT_PUBLIC_API_BASE_URL
+        );
+
+        const response = await fetch(url, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        console.log("[voidOrder] Response status:", response.status);
+        console.log("[voidOrder] Response ok:", response.ok);
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log("[voidOrder] Cancel success:", result);
+          showNotification("Order voided", "info");
+          await loadHeldOrders(); // Refresh held orders list
+        } else {
+          const errorText = await response.text();
+          console.error("[voidOrder] Error response text:", errorText);
+
+          let errorDetail = "Unknown error";
+          try {
+            const errorJson = JSON.parse(errorText);
+            errorDetail =
+              errorJson.detail ||
+              errorJson.message ||
+              JSON.stringify(errorJson);
+          } catch (parseError) {
+            errorDetail = errorText || `HTTP ${response.status}`;
+          }
+
+          console.error("[voidOrder] Parsed error detail:", errorDetail);
+
+          if (response.status === 400) {
+            showNotification(`Cannot cancel order: ${errorDetail}`, "error");
+          } else if (response.status === 404) {
+            console.error(
+              "[voidOrder] ORDER NOT FOUND - This suggests the order ID doesn't exist in the database!"
+            );
+            console.error("[voidOrder] Attempted to cancel order ID:", orderId);
+            console.error("[voidOrder] This could mean:");
+            console.error(
+              "[voidOrder] 1. The order was already deleted/completed"
+            );
+            console.error(
+              "[voidOrder] 2. There's a mismatch between frontend and backend order IDs"
+            );
+            console.error(
+              "[voidOrder] 3. The backend server is not running or is different"
+            );
+            showNotification(
+              "Order not found in database. Voiding locally.",
+              "info"
+            );
+          } else {
+            showNotification(`Error canceling order: ${errorDetail}`, "error");
+          }
+        }
+      } catch (error) {
+        console.error("[voidOrder] Network/Exception error:", error);
+        showNotification(
+          `Network error while canceling order: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`,
+          "error"
+        );
+      }
+    } else {
+      console.log("[voidOrder] No valid order ID, voiding locally only");
+      showNotification("Order voided", "info");
+    }
+
+    // Clear the current order regardless of database update result
+    console.log("[voidOrder] Clearing current order");
     newOrder();
-    showNotification("Order voided", "info");
-  }, [newOrder, showNotification]);
+  }, [currentOrder, newOrder, showNotification, loadHeldOrders]);
 
   return {
     currentOrder,

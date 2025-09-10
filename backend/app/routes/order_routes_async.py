@@ -39,22 +39,49 @@ class OrderCreate(BaseModel):
     order_items: List[OrderItemCreate]
 
 
-@router.put("/{order_id}/status")
+@router.put("/{order_id}/status", response_model=dict)
 async def update_order_status_async(
     order_id: int, status_data: OrderStatusUpdate, db: AsyncSession = Depends(get_db)
 ):
     try:
+        print(f"[DEBUG] Updating order status for order_id: {order_id}")
+        print(f"[DEBUG] Status data: {status_data}")
+
+        # Validate order_id
+        if order_id <= 0:
+            raise HTTPException(status_code=400, detail=f"Invalid order ID: {order_id}")
+
         result = await db.execute(select(Order).where(Order.order_id == order_id))
         order = result.scalars().first()
+
         if not order:
-            raise HTTPException(status_code=404, detail="Order not found")
+            print(f"[DEBUG] Order with ID {order_id} not found in database")
+            raise HTTPException(
+                status_code=404, detail=f"Order with ID {order_id} not found"
+            )
+
+        print(
+            f"[DEBUG] Found order: {order.order_id}, current status: {order.order_status}"
+        )
+
+        old_status = order.order_status
         order.order_status = status_data.order_status
         order.updated_at = datetime.utcnow()
+
         await db.commit()
         await db.refresh(order)
+
+        print(
+            f"[DEBUG] Successfully updated order {order.order_id} status from '{old_status}' to '{order.order_status}'"
+        )
+
         return {"order_id": order.order_id, "order_status": order.order_status}
+    except HTTPException:
+        await db.rollback()
+        raise
     except Exception as e:
         await db.rollback()
+        print(f"[DEBUG] Error updating order status: {str(e)}")
         raise HTTPException(
             status_code=500, detail=f"Failed to update order status: {str(e)}"
         )
@@ -135,6 +162,64 @@ async def get_held_orders_async(db: AsyncSession = Depends(get_db)):
         )
 
 
+# Cancel an order (set status to canceled) - MOVED BEFORE generic get route
+@router.put("/{order_id}/cancel")
+async def cancel_order_async(order_id: int, db: AsyncSession = Depends(get_db)):
+    try:
+        print(f"[DEBUG] Cancel request for order_id: {order_id}")
+
+        # Validate order_id
+        if order_id <= 0:
+            print(f"[DEBUG] Invalid order ID: {order_id}")
+            raise HTTPException(status_code=400, detail=f"Invalid order ID: {order_id}")
+
+        result = await db.execute(select(Order).where(Order.order_id == order_id))
+        order = result.scalars().first()
+
+        if not order:
+            print(f"[DEBUG] Order with ID {order_id} not found in database")
+            raise HTTPException(
+                status_code=404, detail=f"Order with ID {order_id} not found"
+            )
+
+        print(
+            f"[DEBUG] Found order: {order.order_id}, current status: '{order.order_status}'"
+        )
+
+        # Only allow canceling held or pending orders
+        if order.order_status not in ["held", "pending"]:
+            error_msg = f"Cannot cancel order with status '{order.order_status}'. Only 'held' or 'pending' orders can be canceled."
+            print(f"[DEBUG] {error_msg}")
+            raise HTTPException(
+                status_code=400,
+                detail=error_msg,
+            )
+
+        old_status = order.order_status
+        order.order_status = "canceled"
+        order.updated_at = datetime.utcnow()
+        await db.commit()
+        await db.refresh(order)
+
+        print(
+            f"[DEBUG] Successfully canceled order {order.order_id}, status changed from '{old_status}' to 'canceled'"
+        )
+
+        return {
+            "order_id": order.order_id,
+            "order_status": order.order_status,
+            "message": "Order canceled successfully",
+        }
+    except HTTPException:
+        await db.rollback()
+        raise
+    except Exception as e:
+        await db.rollback()
+        error_msg = f"Failed to cancel order: {str(e)}"
+        print(f"[DEBUG] Exception in cancel_order_async: {error_msg}")
+        raise HTTPException(status_code=500, detail=error_msg)
+
+
 # Get a single order by ID
 @router.get("/{order_id}")
 async def get_order_async(order_id: int, db: AsyncSession = Depends(get_db)):
@@ -196,27 +281,6 @@ async def get_orders_async(
 
 
 # Update order status (already present, but add response_model for consistency)
-@router.put("/{order_id}/status", response_model=dict)
-async def update_order_status_async(
-    order_id: int, status_data: OrderStatusUpdate, db: AsyncSession = Depends(get_db)
-):
-    try:
-        result = await db.execute(select(Order).where(Order.order_id == order_id))
-        order = result.scalars().first()
-        if not order:
-            raise HTTPException(status_code=404, detail="Order not found")
-        order.order_status = status_data.order_status
-        order.updated_at = datetime.utcnow()
-        await db.commit()
-        await db.refresh(order)
-        return {"order_id": order.order_id, "order_status": order.order_status}
-    except Exception as e:
-        await db.rollback()
-        raise HTTPException(
-            status_code=500, detail=f"Failed to update order status: {str(e)}"
-        )
-
-
 # Get today's order summary
 @router.get("/today/summary")
 async def get_today_summary_async(db: AsyncSession = Depends(get_db)):
@@ -226,20 +290,52 @@ async def get_today_summary_async(db: AsyncSession = Depends(get_db)):
         orders = result.scalars().all()
         summary = {
             "total_orders": len(orders),
-            "total_revenue": sum(order.total_amount for order in orders),
+            "total_revenue": sum(
+                order.total_amount
+                for order in orders
+                if order.order_status != "canceled"
+            ),
             "completed_orders": len(
                 [o for o in orders if o.order_status == "completed"]
             ),
             "pending_orders": len([o for o in orders if o.order_status == "pending"]),
             "held_orders": len([o for o in orders if o.order_status == "held"]),
-            "cash_orders": len([o for o in orders if o.payment_method == "cash"]),
-            "gcash_orders": len([o for o in orders if o.payment_method == "gcash"]),
-            "dining_orders": len([o for o in orders if o.order_type == "Dining"]),
-            "takeout_orders": len([o for o in orders if o.order_type == "Takeout"]),
+            "canceled_orders": len([o for o in orders if o.order_status == "canceled"]),
+            "cash_orders": len(
+                [
+                    o
+                    for o in orders
+                    if o.payment_method == "cash" and o.order_status != "canceled"
+                ]
+            ),
+            "gcash_orders": len(
+                [
+                    o
+                    for o in orders
+                    if o.payment_method == "gcash" and o.order_status != "canceled"
+                ]
+            ),
+            "dining_orders": len(
+                [
+                    o
+                    for o in orders
+                    if o.order_type == "Dining" and o.order_status != "canceled"
+                ]
+            ),
+            "takeout_orders": len(
+                [
+                    o
+                    for o in orders
+                    if o.order_type == "Takeout" and o.order_status != "canceled"
+                ]
+            ),
         }
         return summary
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get summary: {str(e)}")
+
+
+# Cancel route moved before generic get route
 
 
 # Cancel (soft delete) an order
