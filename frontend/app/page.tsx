@@ -613,37 +613,39 @@ export default function POS() {
       <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 max-w-xs sm:max-w-md w-full border-2 border-gray-300 font-mono">
           <div className="text-center mb-2">
-            <div className="text-black font-bold text-lg">🖨️ RECEIPT</div>
-            <div className="text-xs text-black">Cardiac Delights POS</div>
-            <div className="text-xs text-black mb-2">
+            <div className="text-black font-bold text-xl">🖨️ RECEIPT</div>
+            <div className="text-base text-white font-medium">
+              Cardiac Delights POS
+            </div>
+            <div className="text-base text-white mb-2">
               {new Date().toLocaleString()}
             </div>
             <div className="border-b border-gray-400 my-2" />
           </div>
           <div className="mb-2">
-            <div className="flex justify-between text-xs">
+            <div className="flex justify-between text-sm">
               <span className="font-bold">Order #</span>
-              <span className="text-black">
+              <span className="text-white">
                 {getSequentialOrderNumber(orderData?.id)}
               </span>
             </div>
-            <div className="flex justify-between text-xs">
-              <span className="font-bold text-black">Customer</span>
-              <span className="text-black">{orderData?.customer}</span>
+            <div className="flex justify-between text-base">
+              <span className="font-bold text-white">Customer</span>
+              <span className="text-white">{orderData?.customer}</span>
             </div>
-            <div className="flex justify-between text-xs">
-              <span className="font-bold text-black">Type</span>
-              <span className="text-black">{orderData?.type}</span>
+            <div className="flex justify-between text-base">
+              <span className="font-bold text-white">Type</span>
+              <span className="text-white">{orderData?.type}</span>
             </div>
           </div>
           <div className="border-b border-gray-400 my-2" />
           <div className="mb-2">
-            <div className="font-bold text-xs mb-1 text-black">Items:</div>
-            <div className="space-y-1 text-black">
+            <div className="font-bold text-base mb-1 text-white">Items:</div>
+            <div className="space-y-1 text-white">
               {orderData?.items?.map((item: any, idx: number) => (
                 <div
                   key={item.id}
-                  className="flex justify-between text-xs text-black"
+                  className="flex justify-between text-sm text-black"
                 >
                   <span className="text-black">
                     {item.quantity}x {item.name}
@@ -656,8 +658,8 @@ export default function POS() {
             </div>
           </div>
           <div className="border-b border-gray-400 my-2" />
-          <div className="mb-2 text-xs">
-            <div className="flex justify-between">
+          <div className="mb-2 text-sm">
+            <div className="flex justify-between font-medium text-black">
               <span className="text-black">Subtotal</span>
               <span className="text-black">
                 ₱{(orderData?.subtotal ?? 0).toFixed(2)}
@@ -685,7 +687,7 @@ export default function POS() {
             </div>
           </div>
           <div className="border-b border-gray-400 my-2" />
-          <div className="text-center text-xs text-black mb-2">
+          <div className="text-center text-sm text-black mb-2 font-medium">
             Thank you for dining with us!
           </div>
           <div className="flex gap-2 mt-2">
@@ -809,7 +811,7 @@ export default function POS() {
   };
 
   return (
-    <div className="flex flex-col xl:flex-row min-h-screen bg-gradient-to-br from-black/95 to-slate-800 text-yellow-400 font-mono relative overflow-hidden">
+    <div className="flex flex-col xl:flex-row min-h-screen bg-gradient-to-br from-black/95 to-slate-800 text-white font-mono relative overflow-hidden">
       {/* Elegant Background Pattern */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div
@@ -823,7 +825,7 @@ export default function POS() {
       </div>
 
       {/* Top Bar */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 to-amber-500 shadow-lg shadow-yellow-400/20 pointer-events-none z-30"></div>
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-br from-slate-900/95 to-black/95 shadow-lg shadow-yellow-400/20 pointer-events-none z-30"></div>
 
       {/* Notification System */}
       {pos.order.notification && (
@@ -860,7 +862,7 @@ export default function POS() {
       {/* Left Panel - Terminal Order Display */}
       <div className="w-full xl:w-1/3 bg-gradient-to-br from-slate-900/95 to-black/95 backdrop-blur-sm border-r-0 xl:border-r-2 border-b-2 xl:border-b-0 border-yellow-400/20 flex flex-col font-mono relative z-10 min-h-0 flex-1">
         {/* Terminal Status Bar */}
-        <div className="bg-gradient-to-br from-yellow-400 to-yellow-500 text-black px-2 sm:px-4 py-1 sm:py-2 font-bold uppercase tracking-wider text-xs sm:text-sm flex-shrink-0">
+        <div className="bg-white text-black px-2 sm:px-4 py-1 sm:py-2 font-bold uppercase tracking-wider text-sm sm:text-base flex-shrink-0">
           <div className="flex items-center justify-between">
             <span className="hidden sm:inline">◆ CASHIER TERMINAL ◆</span>
             <span className="sm:hidden">◆ POS ◆</span>
@@ -871,7 +873,7 @@ export default function POS() {
         {/* Order Header */}
         <div className="p-2 sm:p-4 border-b-2 border-yellow-400/30 bg-slate-800/50 backdrop-blur-sm flex-shrink-0">
           <div className="text-center mb-2 sm:mb-8 relative">
-            <div className="text-yellow-400 font-bold text-sm sm:text-lg border-2 border-yellow-400 bg-slate-900/50 px-2 sm:px-4 py-1 sm:py-2 shadow-lg inline-block">
+            <div className="text-white font-bold text-lg sm:text-xl border-2 border-white bg-slate-900/50 px-2 sm:px-4 py-1 sm:py-2 shadow-lg inline-block">
               <span className="hidden sm:inline">
                 ═══ ORDER #{getSequentialOrderNumber(pos.order.currentOrder.id)}{" "}
                 ═══
@@ -882,13 +884,13 @@ export default function POS() {
             </div>
           </div>
 
-          <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
+          <div className="space-y-1 sm:space-y-2 text-sm sm:text-base">
             <div className="flex justify-between">
-              <span className="text-yellow-400">CASHIER:</span>
-              <span className="text-yellow-400 font-bold">SYSTEM</span>
+              <span className="text-white">CASHIER:</span>
+              <span className="text-white font-bold">SYSTEM</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-yellow-400">CUSTOMER:</span>
+              <span className="text-white">CUSTOMER:</span>
               {pos.customerInput.isEditingCustomer ? (
                 <div className="flex items-center space-x-1">
                   <input
@@ -898,26 +900,26 @@ export default function POS() {
                       pos.customerInput.setCustomerNameInput(e.target.value)
                     }
                     onFocus={() => pos.customerInput.setCustomerNameInput("")}
-                    className="bg-slate-900/90 border border-yellow-400/50 text-yellow-400 font-mono px-1 sm:px-2 py-0 text-xs w-20 sm:w-32 focus:outline-none focus:border-yellow-400 focus:bg-slate-800/90"
+                    className="bg-slate-900/90 border border-yellow-400/50 text-white font-mono px-1 sm:px-2 py-1 text-sm w-20 sm:w-32 focus:outline-none focus:border-yellow-400 focus:bg-slate-800/90"
                     placeholder="Name..."
                     autoFocus
                   />
                   <button
                     onClick={saveCustomerName}
-                    className="text-yellow-400 hover:text-yellow-300 text-xs font-bold"
+                    className="text-white hover:text-white text-sm font-bold"
                   >
                     ✓
                   </button>
                   <button
                     onClick={cancelEditingCustomer}
-                    className="text-red-400 hover:text-red-300 text-xs font-bold"
+                    className="text-red-400 hover:text-red-300 text-sm font-bold"
                   >
                     ✗
                   </button>
                 </div>
               ) : (
                 <span
-                  className="text-yellow-400 font-bold cursor-pointer hover:text-yellow-300 border-b border-dotted border-yellow-400/50 truncate max-w-24 sm:max-w-32"
+                  className="text-white font-bold cursor-pointer hover:text-white border-b border-dotted border-white/50 truncate max-w-24 sm:max-w-32"
                   onClick={startEditingCustomer}
                   title="Click to edit customer name"
                 >
@@ -926,22 +928,22 @@ export default function POS() {
               )}
             </div>
             <div className="flex justify-between">
-              <span className="text-yellow-400">TYPE:</span>
-              <span className="text-yellow-400 font-bold">
+              <span className="text-white">TYPE:</span>
+              <span className="text-white font-bold">
                 {pos.order.currentOrder.type}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-yellow-400">DATE & TIME:</span>
-              <span className="text-yellow-400 font-bold">
+              <span className="text-white">DATE & TIME:</span>
+              <span className="text-white font-bold">
                 {pos.clock.currentTime.toLocaleDateString()} |{" "}
                 {formatTime(pos.clock.currentTime)}
               </span>
             </div>
             {pos.order.currentOrder.notes && (
               <div className="flex flex-col">
-                <span className="text-yellow-400">NOTES:</span>
-                <span className="text-yellow-400/80 text-xs mt-1 break-words">
+                <span className="text-white">NOTES:</span>
+                <span className="text-white/80 text-xs mt-1 break-words">
                   {pos.order.currentOrder.notes}
                 </span>
               </div>
@@ -949,24 +951,24 @@ export default function POS() {
           </div>
 
           {/* Terminal Stats */}
-          <div className="mt-2 sm:mt-4 grid grid-cols-3 gap-1 sm:gap-2 text-center text-xs">
-            <div className="border border-yellow-400/30 bg-slate-800/30 p-1 sm:p-2">
-              <div className="text-yellow-400 font-bold text-sm sm:text-lg">
+          <div className="mt-2 sm:mt-4 grid grid-cols-3 gap-1 sm:gap-2 text-center text-sm">
+            <div className="border border-white/30 bg-slate-800/30 p-1 sm:p-2">
+              <div className="text-white font-bold text-base sm:text-xl">
                 {pos.order.currentOrder.items.length}
               </div>
-              <div className="text-yellow-400/80 text-xs">ITEMS</div>
+              <div className="text-white/80 text-sm">ITEMS</div>
             </div>
-            <div className="border border-yellow-400/30 bg-slate-800/30 p-1 sm:p-2">
-              <div className="text-yellow-400 font-bold text-sm sm:text-lg">
+            <div className="border border-white/30 bg-slate-800/30 p-1 sm:p-2">
+              <div className="text-white font-bold text-base sm:text-xl">
                 ₱{(pos.order.currentOrder.subtotal ?? 0).toFixed(0)}
               </div>
-              <div className="text-yellow-400/80 text-xs">SUB</div>
+              <div className="text-white/80 text-sm">SUB</div>
             </div>
-            <div className="border border-yellow-400/30 bg-slate-800/30 p-1 sm:p-2">
-              <div className="text-yellow-400 font-bold text-sm sm:text-lg">
+            <div className="border border-white/30 bg-slate-800/30 p-1 sm:p-2">
+              <div className="text-white font-bold text-base sm:text-xl">
                 ₱{(pos.order.currentOrder.total ?? 0).toFixed(0)}
               </div>
-              <div className="text-yellow-400/80 text-xs">TOTAL</div>
+              <div className="text-white/80 text-sm">TOTAL</div>
             </div>
           </div>
         </div>
@@ -974,45 +976,45 @@ export default function POS() {
         {/* Terminal Order Items Display */}
         <div className="flex-1 p-2 sm:p-4 overflow-y-auto bg-slate-900/30 backdrop-blur-sm min-h-0">
           {/* Terminal Header */}
-          <div className="text-center mb-2 sm:mb-4 p-2 sm:p-8 text-yellow-400 font-bold border-b border-yellow-400/30 pb-2 text-xs sm:text-base">
+          <div className="text-center mb-2 sm:mb-4 p-2 sm:p-8 text-white font-bold border-b border-white/30 pb-2 text-xs sm:text-base">
             │ ORDER DETAILS │
           </div>
 
           {pos.order.currentOrder.items.length === 0 ? (
-            <div className="text-center text-yellow-400/80 py-4 sm:py-8">
-              <div className="border border-yellow-400/30 bg-slate-800/30 p-4 sm:p-8 mb-4">
+            <div className="text-center text-white/80 py-4 sm:py-8">
+              <div className="border border-white/30 bg-slate-800/30 p-4 sm:p-8 mb-4">
                 <div className="text-xl sm:text-2xl mb-2 sm:mb-4">╳</div>
                 <div className="text-xs sm:text-sm font-bold mb-1 sm:mb-2">
                   NO ITEMS ADDED
                 </div>
-                <div className="text-xs text-yellow-400/60">
+                <div className="text-xs text-white/60">
                   SELECT ITEMS FROM MENU TO START ORDER
                 </div>
               </div>
-              <div className="text-xs text-yellow-400 blinking">
+              <div className="text-xs text-white blinking">
                 ► READY TO TAKE ORDER ◄
               </div>
             </div>
           ) : (
             <div className="space-y-1">
               {/* Terminal Table Header */}
-              <div className="text-xs text-yellow-400/80 border-b border-yellow-400/30 pb-1 mb-2 font-bold">
+              <div className="text-xs text-white/80 border-b border-white/30 pb-1 mb-2 font-bold">
                 # ITEM NAME QTY UNIT TOTAL ACTION
               </div>
 
               {pos.order.currentOrder.items.map((item, index) => (
                 <div
                   key={item.id}
-                  className="text-sm font-mono bg-slate-800/50 border border-yellow-400/30 hover:bg-slate-700/50 transition-all text-yellow-400"
+                  className="text-sm font-mono bg-slate-800/50 border border-white/30 hover:bg-slate-700/50 transition-all text-white"
                 >
                   <div className="flex items-center justify-between p-2 space-x-2">
                     {/* Item Number */}
-                    <div className="text-yellow-400 font-bold w-6 text-center">
+                    <div className="text-white font-bold w-6 text-center">
                       {String(index + 1).padStart(2, "0")}
                     </div>
 
                     {/* Item Name */}
-                    <div className="text-yellow-400 truncate flex-1 text-left min-w-0">
+                    <div className="text-white truncate flex-1 text-left min-w-0">
                       {item.name}
                     </div>
 
@@ -1022,37 +1024,37 @@ export default function POS() {
                         onClick={() =>
                           updateQuantity(item.id, item.quantity - 1)
                         }
-                        className="w-3 h-3 bg-red-600/80 text-yellow-400 text-xs font-bold hover:bg-red-500 active:bg-red-700 border border-red-400 touch-manipulation cursor-pointer select-none active:scale-90 transition-all"
+                        className="w-3 h-3 bg-red-600/80 text-white text-xs font-bold hover:bg-red-500 active:bg-red-700 border border-red-400 touch-manipulation cursor-pointer select-none active:scale-90 transition-all"
                       >
                         -
                       </button>
-                      <span className="text-yellow-400 font-bold w-6 text-center bg-slate-900/50 border border-yellow-400/30 px-10 text-xs">
+                      <span className="text-white font-bold w-6 text-center bg-slate-900/50 border border-white/30 px-10 text-xs">
                         {String(item.quantity).padStart(2, "0")}
                       </span>
                       <button
                         onClick={() =>
                           updateQuantity(item.id, item.quantity + 1)
                         }
-                        className="w-3 h-3 bg-green-600/80 text-yellow-400 text-xs font-bold hover:bg-green-500 active:bg-green-700 border border-green-400 touch-manipulation cursor-pointer select-none active:scale-90 transition-all"
+                        className="w-3 h-3 bg-green-600/80 text-white text-xs font-bold hover:bg-green-500 active:bg-green-700 border border-green-400 touch-manipulation cursor-pointer select-none active:scale-90 transition-all"
                       >
                         +
                       </button>
                     </div>
 
                     {/* Unit Price */}
-                    <div className="text-yellow-400 text-xs w-12 text-center">
+                    <div className="text-white text-xs w-12 text-center">
                       ₱{(item.price ?? 0).toFixed(0)}
                     </div>
 
                     {/* Total Price */}
-                    <div className="text-yellow-400 font-bold text-sm w-16 text-center">
+                    <div className="text-white font-bold text-sm w-16 text-center">
                       ₱{(item.total ?? 0).toFixed(2)}
                     </div>
 
                     {/* Remove Button */}
                     <button
                       onClick={() => handleDeleteItem(item.id, item.name)}
-                      className="text-yellow-400 bg-red-600/80 hover:bg-red-600 active:bg-red-700 active:text-yellow-300 text-xs font-bold px-2 py-1 border border-red-400 touch-manipulation cursor-pointer select-none active:scale-90 transition-all ml-2"
+                      className="text-white bg-red-600/80 hover:bg-red-600 active:bg-red-700 active:text-white text-xs font-bold px-2 py-1 border border-red-400 touch-manipulation cursor-pointer select-none active:scale-90 transition-all ml-2"
                     >
                       DEL
                     </button>
@@ -1064,38 +1066,38 @@ export default function POS() {
         </div>
 
         {/* Terminal Footer - Order Summary */}
-        <div className="p-4 border-t-2 border-yellow-400/30 bg-slate-800/50 backdrop-blur-sm">
+        <div className="p-4 border-t-2 border-white/30 bg-slate-800/50 backdrop-blur-sm">
           {/* Terminal Receipt Style */}
-          <div className="border border-yellow-400/30 bg-slate-900/50 p-3 text-sm font-mono">
-            <div className="text-center text-yellow-400 font-bold border-b border-yellow-400/30 pb-2 mb-3">
+          <div className="border border-white/30 bg-slate-900/50 p-3 text-sm font-mono">
+            <div className="text-center text-white font-bold border-b border-white/30 pb-2 mb-3">
               ═══ RECEIPT PREVIEW ═══
             </div>
 
             <div className="space-y-1 text-xs">
               <div className="flex justify-between">
-                <span className="text-yellow-400">SUBTOTAL:</span>
-                <span className="text-yellow-400 font-bold">
+                <span className="text-white">SUBTOTAL:</span>
+                <span className="text-white font-bold">
                   ₱{(pos.order.currentOrder.subtotal ?? 0).toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-yellow-400">VAT (Included):</span>
-                <span className="text-yellow-400 font-bold">
+                <span className="text-white">VAT (Included):</span>
+                <span className="text-white font-bold">
                   ₱{(pos.order.currentOrder.vat ?? 0).toFixed(2)}
                 </span>
               </div>
               {pos.order.currentOrder.discount > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-yellow-400">DISCOUNT:</span>
+                  <span className="text-white">DISCOUNT:</span>
                   <span className="text-red-400 font-bold">
                     -₱{(pos.order.currentOrder.discount ?? 0).toFixed(2)}
                   </span>
                 </div>
               )}
-              <div className="border-t border-yellow-400/30 pt-2 mt-2">
+              <div className="border-t border-white/30 pt-2 mt-2">
                 <div className="flex justify-between">
-                  <span className="text-yellow-400 font-bold">TOTAL DUE:</span>
-                  <span className="text-yellow-400 font-bold text-lg">
+                  <span className="text-white font-bold">TOTAL DUE:</span>
+                  <span className="text-white font-bold text-lg">
                     ₱{(pos.order.currentOrder.total ?? 0).toFixed(2)}
                   </span>
                 </div>
@@ -1115,33 +1117,33 @@ export default function POS() {
               <button
                 onClick={handleVoidOrder}
                 disabled={pos.order.currentOrder.items.length === 0}
-                className="bg-gradient-to-br from-red-700/90 to-red-800/90 hover:from-red-600/90 hover:to-red-700/90 active:from-red-800/90 active:to-red-900/90 disabled:from-slate-700/50 disabled:to-slate-800/50 text-yellow-400 disabled:text-slate-500 px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm font-bold border border-red-400/70 disabled:border-slate-600/50 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 min-h-[40px] sm:min-h-[50px]"
+                className="bg-gradient-to-br from-red-700/90 to-red-800/90 hover:from-red-600/90 hover:to-red-700/90 active:from-red-800/90 active:to-red-900/90 disabled:from-slate-700/50 disabled:to-slate-800/50 text-white disabled:text-slate-500 px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm font-bold border border-red-400/70 disabled:border-slate-600/50 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 min-h-[40px] sm:min-h-[50px]"
               >
                 VOID
               </button>
               <button
                 onClick={handleHoldOrder}
                 disabled={pos.order.currentOrder.items.length === 0}
-                className="bg-gradient-to-br from-slate-600/90 to-slate-700/90 hover:from-slate-500/90 hover:to-slate-600/90 active:from-slate-700/90 active:to-slate-800/90 disabled:from-slate-700/50 disabled:to-slate-800/50 text-yellow-400 disabled:text-slate-500 px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm font-bold border border-slate-400/70 disabled:border-slate-600/50 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 min-h-[40px] sm:min-h-[50px]"
+                className="bg-gradient-to-br from-slate-600/90 to-slate-700/90 hover:from-slate-500/90 hover:to-slate-600/90 active:from-slate-700/90 active:to-slate-800/90 disabled:from-slate-700/50 disabled:to-slate-800/50 text-white disabled:text-slate-500 px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm font-bold border border-slate-400/70 disabled:border-slate-600/50 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 min-h-[40px] sm:min-h-[50px]"
               >
                 HOLD
               </button>
               <button
                 onClick={showNotesModal}
                 disabled={pos.order.currentOrder.items.length === 0}
-                className="bg-gradient-to-br from-purple-600/90 to-purple-700/90 hover:from-purple-500/90 hover:to-purple-600/90 active:from-purple-700/90 active:to-purple-800/90 disabled:from-slate-700/50 disabled:to-slate-800/50 text-yellow-400 disabled:text-slate-500 px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm font-bold border border-purple-400/70 disabled:border-slate-600/50 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 min-h-[40px] sm:min-h-[50px] relative"
+                className="bg-gradient-to-br from-purple-600/90 to-purple-700/90 hover:from-purple-500/90 hover:to-purple-600/90 active:from-purple-700/90 active:to-purple-800/90 disabled:from-slate-700/50 disabled:to-slate-800/50 text-white disabled:text-slate-500 px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm font-bold border border-purple-400/70 disabled:border-slate-600/50 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 min-h-[40px] sm:min-h-[50px] relative"
                 title="Add customer notes or special requests"
               >
                 📝 NOTES
                 {pos.order.currentOrder.notes && (
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full"></span>
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full"></span>
                 )}
               </button>
               {/* Show HELD button only if there are held orders */}
               {pos.order.heldOrders.length > 0 && (
                 <button
                   onClick={() => pos.modals.openHeldOrdersModal()}
-                  className="bg-gradient-to-br from-blue-600/90 to-blue-700/90 hover:from-blue-500/90 hover:to-blue-600/90 active:from-blue-700/90 active:to-blue-800/90 text-yellow-400 px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm font-bold border border-blue-400/70 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 min-h-[40px] sm:min-h-[50px] col-span-2 sm:col-span-1"
+                  className="bg-gradient-to-br from-blue-600/90 to-blue-700/90 hover:from-blue-500/90 hover:to-blue-600/90 active:from-blue-700/90 active:to-blue-800/90 text-white px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm font-bold border border-blue-400/70 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 min-h-[40px] sm:min-h-[50px] col-span-2 sm:col-span-1"
                   title="View held orders"
                 >
                   <span className="hidden sm:inline">
@@ -1155,7 +1157,7 @@ export default function POS() {
               <button
                 onClick={handleTakeoutOrder}
                 disabled={pos.order.currentOrder.items.length === 0}
-                className="bg-gradient-to-br from-orange-600/90 to-orange-700/90 hover:from-orange-500/90 hover:to-orange-600/90 active:from-orange-700/90 active:to-orange-800/90 disabled:from-slate-700/50 disabled:to-slate-800/50 text-yellow-400 disabled:text-slate-500 px-3 sm:px-6 py-3 sm:py-6 text-sm sm:text-base font-bold border border-orange-400/70 disabled:border-slate-600/50 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 min-h-[50px] sm:min-h-[60px]"
+                className="bg-gradient-to-br from-orange-600/90 to-orange-700/90 hover:from-orange-500/90 hover:to-orange-600/90 active:from-orange-700/90 active:to-orange-800/90 disabled:from-slate-700/50 disabled:to-slate-800/50 text-white disabled:text-slate-500 px-3 sm:px-6 py-3 sm:py-6 text-sm sm:text-base font-bold border border-orange-400/70 disabled:border-slate-600/50 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 min-h-[50px] sm:min-h-[60px]"
               >
                 TAKEOUT
               </button>
@@ -1165,11 +1167,11 @@ export default function POS() {
                   pos.order.isProcessing ||
                   pos.order.currentOrder.items.length === 0
                 }
-                className="bg-gradient-to-br from-green-600/90 to-green-700/90 hover:from-green-500/90 hover:to-green-600/90 active:from-green-700/90 active:to-green-800/90 disabled:from-slate-700/50 disabled:to-slate-800/50 text-yellow-400 disabled:text-slate-500 px-3 sm:px-6 py-3 sm:py-6 text-sm sm:text-base font-bold border border-green-400/70 disabled:border-slate-600/50 transition-all uppercase tracking-wider relative touch-manipulation cursor-pointer select-none active:scale-95 min-h-[50px] sm:min-h-[60px]"
+                className="bg-gradient-to-br from-green-600/90 to-green-700/90 hover:from-green-500/90 hover:to-green-600/90 active:from-green-700/90 active:to-green-800/90 disabled:from-slate-700/50 disabled:to-slate-800/50 text-white disabled:text-slate-500 px-3 sm:px-6 py-3 sm:py-6 text-sm sm:text-base font-bold border border-green-400/70 disabled:border-slate-600/50 transition-all uppercase tracking-wider relative touch-manipulation cursor-pointer select-none active:scale-95 min-h-[50px] sm:min-h-[60px]"
               >
                 {pos.order.isProcessing ? (
                   <div className="flex items-center justify-center space-x-1 sm:space-x-2">
-                    <div className="w-3 h-3 sm:w-4 sm:h-4 border border-yellow-400 border-t-transparent animate-spin rounded-full"></div>
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 border border-white border-t-transparent animate-spin rounded-full"></div>
                     <span className="text-xs sm:text-base">
                       [PROCESSING...]
                     </span>
@@ -1193,7 +1195,7 @@ export default function POS() {
         {/* Terminal Menu Header */}
         <div className="border-b-2 border-yellow-400/30 bg-slate-800/50 backdrop-blur-sm relative z-20 flex-shrink-0">
           {/* Terminal Title Bar */}
-          <div className="bg-gradient-to-br from-yellow-400 to-yellow-500 text-black px-2 sm:px-4 py-1 font-bold text-center uppercase tracking-wider text-xs sm:text-sm">
+          <div className="bg-white text-black px-2 sm:px-4 py-1 font-bold text-center uppercase tracking-wider text-xs sm:text-sm">
             <span className="hidden md:inline">
               ◆◆◆ MENU SELECTION TERMINAL ◆◆◆
             </span>
@@ -1201,13 +1203,13 @@ export default function POS() {
           </div>
 
           <div className="p-2 sm:p-6">
-            <div className="text-center text-yellow-400 font-bold mb-3 sm:mb-6 text-2xl hidden sm:block">
+            <div className="text-center text-white font-bold mb-3 sm:mb-6 text-2xl hidden sm:block">
               ◆ MENU ◆
             </div>
 
             {/* Category Selection */}
             <div className="mb-3 sm:mb-6">
-              <div className="text-yellow-400 font-bold mb-2 sm:mb-4 text-center border border-yellow-400/50 bg-slate-900/50 p-1 sm:p-2 text-xs sm:text-sm">
+              <div className="text-white font-bold mb-2 sm:mb-4 text-center border border-white/50 bg-slate-900/50 p-1 sm:p-2 text-xs sm:text-sm">
                 <span className="hidden sm:inline">
                   ═══ SELECT CATEGORY ═══ ({categories.length} AVAILABLE) ═══
                 </span>
@@ -1227,7 +1229,7 @@ export default function POS() {
                     className={`p-3 sm:p-6 text-xs sm:text-base font-bold border-2 transition-all uppercase tracking-wider min-h-[80px] sm:min-h-[120px] touch-manipulation cursor-pointer select-none active:scale-95 ${
                       selectedCategory === category
                         ? "bg-gradient-to-br from-yellow-400 to-yellow-500 text-black border-yellow-400 shadow-lg shadow-yellow-400/30 border-4"
-                        : "bg-gradient-to-br from-slate-700/90 to-slate-800/90 text-yellow-400 border-yellow-400/30 hover:from-slate-600/90 hover:to-slate-700/90 hover:text-yellow-300 active:from-slate-800/90 active:to-slate-900/90"
+                        : "bg-gradient-to-br from-slate-700/90 to-slate-800/90 text-white border-white/30 hover:from-slate-600/90 hover:to-slate-700/90 hover:text-yellow-300 active:from-slate-800/90 active:to-slate-900/90"
                     }`}
                   >
                     <div className="text-center">
@@ -1252,25 +1254,25 @@ export default function POS() {
           <div className="p-2 sm:p-6 relative z-20">
             {/* Current Category Header */}
             <div className="mb-3 sm:mb-6">
-              <div className="text-center text-yellow-400 font-bold border border-yellow-400/50 bg-slate-900/50 backdrop-blur-sm p-2 sm:p-3 text-xs sm:text-sm">
+              <div className="text-center text-white font-bold border border-white/50 bg-slate-900/50 backdrop-blur-sm p-2 sm:p-3 text-xs sm:text-sm">
                 <span className="hidden sm:block">
                   ◆ {selectedCategory.toUpperCase()} MENU ITEMS ◆
                 </span>
                 <span className="sm:hidden">
                   {selectedCategory.toUpperCase()}
                 </span>
-                <div className="text-xs mt-1 sm:mt-2 text-yellow-400/80">
+                <div className="text-xs mt-1 sm:mt-2 text-white/80">
                   {filteredMenuItems.length} ITEMS • CLICK TO ORDER
                 </div>
               </div>
             </div>
 
             {filteredMenuItems.length === 0 ? (
-              <div className="text-center text-yellow-400/80 py-12">
-                <div className="border border-yellow-400/30 bg-slate-800/50 p-8">
+              <div className="text-center text-white/80 py-12">
+                <div className="border border-white/30 bg-slate-800/50 p-8">
                   <div className="text-4xl mb-4">⚠</div>
                   <div className="text-lg font-bold mb-2">NO ITEMS FOUND</div>
-                  <div className="text-sm text-yellow-400/60">
+                  <div className="text-sm text-white/60">
                     CATEGORY "{selectedCategory.toUpperCase()}" IS EMPTY
                   </div>
                 </div>
@@ -1281,43 +1283,43 @@ export default function POS() {
                   <button
                     key={item.id}
                     onClick={() => addToOrder(item)}
-                    className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-2 border-yellow-400/30 hover:from-slate-700/90 hover:to-slate-800/90 hover:border-yellow-400 active:from-yellow-600 active:to-yellow-700 transition-all p-2 sm:p-4 md:p-6 text-left group touch-manipulation cursor-pointer select-none active:scale-95 min-h-[120px] sm:min-h-[160px] md:min-h-[200px]"
+                    className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-2 border-white/30 hover:from-slate-700/90 hover:to-slate-800/90 hover:border-white active:from-white active:to-white transition-all p-2 sm:p-4 md:p-6 text-left group touch-manipulation cursor-pointer select-none active:scale-95 min-h-[120px] sm:min-h-[160px] md:min-h-[200px]"
                   >
                     <div className="space-y-1 sm:space-y-2 md:space-y-3">
                       {/* Item Number & Name */}
                       <div className="flex justify-between items-start">
-                        <div className="text-xs sm:text-sm md:text-md bg-slate-900 text-yellow-400 px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 font-bold rounded border border-yellow-400/30">
+                        <div className="text-xs sm:text-sm md:text-md bg-slate-900 text-white px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 font-bold rounded border border-yellow-400/30">
                           #{String(index + 1).padStart(2, "0")}
                         </div>
-                        <div className="text-xs sm:text-sm text-yellow-400 font-bold">
+                        <div className="text-xs sm:text-sm text-white font-bold">
                           [ADD]
                         </div>
                       </div>
 
-                      <div className="text-sm sm:text-base md:text-lg font-bold text-yellow-400 uppercase leading-tight min-h-[2rem] sm:min-h-[2.5rem] md:min-h-[3rem] flex items-center">
+                      <div className="text-sm sm:text-base md:text-lg font-bold text-white uppercase leading-tight min-h-[2rem] sm:min-h-[2.5rem] md:min-h-[3rem] flex items-center">
                         {item.name}
                       </div>
 
-                      <div className="text-xs sm:text-sm text-yellow-400/80 leading-tight min-h-[1.5rem] sm:min-h-[2rem] md:min-h-[3rem] flex items-start overflow-hidden">
+                      <div className="text-xs sm:text-sm text-white/80 leading-tight min-h-[1.5rem] sm:min-h-[2rem] md:min-h-[3rem] flex items-start overflow-hidden">
                         <span className="line-clamp-2 md:line-clamp-3">
                           {(item as any).description}
                         </span>
                       </div>
 
                       {/* Price Display */}
-                      <div className="border-t border-yellow-400/30 pt-1 sm:pt-2 md:pt-3 mt-1 sm:mt-2 md:mt-3">
+                      <div className="border-t border-white/30 pt-1 sm:pt-2 md:pt-3 mt-1 sm:mt-2 md:mt-3">
                         <div className="text-center">
-                          <div className="text-lg sm:text-xl md:text-2xl font-bold text-yellow-400">
+                          <div className="text-lg sm:text-xl md:text-2xl font-bold text-white">
                             ₱{(item.price ?? 0).toFixed(2)}
                           </div>
-                          <div className="text-xs sm:text-sm text-yellow-400/80">
+                          <div className="text-xs sm:text-sm text-white/80">
                             UNIT PRICE
                           </div>
                         </div>
                       </div>
 
                       {/* Terminal Action Indicator */}
-                      <div className="text-xs sm:text-sm text-center text-yellow-400 border border-yellow-400/50 bg-slate-900/30 py-1 sm:py-2 font-bold">
+                      <div className="text-xs sm:text-sm text-center text-white border border-white/50 bg-slate-900/30 py-1 sm:py-2 font-bold">
                         CLICK TO ADD TO ORDER
                       </div>
                     </div>
@@ -1426,8 +1428,14 @@ export default function POS() {
 
             <input
               type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               value={pos.modals.gcashReference}
-              onChange={(e) => pos.modals.setGcashReference(e.target.value)}
+              onChange={(e) => {
+                // Only allow digits, remove all non-digit characters
+                const numericValue = e.target.value.replace(/\D/g, "");
+                pos.modals.setGcashReference(numericValue);
+              }}
               placeholder="Enter GCash Reference Number"
               className="w-full p-2 sm:p-3 mb-2 sm:mb-3 md:mb-4 bg-gray-800 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-green-400 text-xs sm:text-sm"
               autoFocus
@@ -1707,18 +1715,18 @@ export default function POS() {
                       <div className="text-white font-bold text-sm sm:text-base">
                         ORDER #{getSequentialOrderNumber(order.id)}
                       </div>
-                      <div className="text-white text-xs sm:text-sm">
+                      <div className="text-white text-sm sm:text-base">
                         Customer: {order.customer}
                       </div>
-                      <div className="text-white text-xs sm:text-sm">
+                      <div className="text-white text-sm sm:text-base">
                         Held at: {order.heldAt}
                       </div>
-                      <div className="text-white text-xs sm:text-sm">
+                      <div className="text-white text-sm sm:text-base">
                         Items: {order.items.length} | Total: ₱
-                        {order.total.toFixed(2)}
+                        {(order.total || 0).toFixed(2)}
                       </div>
                       {order.notes && (
-                        <div className="text-yellow-400/80 text-xs mt-1">
+                        <div className="text-yellow-400/80 text-sm mt-1">
                           📝 Notes: {order.notes}
                         </div>
                       )}
@@ -1731,7 +1739,7 @@ export default function POS() {
                             index
                           )
                         }
-                        className="bg-green-800 hover:bg-green-700 active:bg-green-900 text-white px-2 sm:px-3 py-1 sm:py-2 text-xs font-bold border border-green-400 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 w-full sm:w-auto"
+                        className="bg-green-800 hover:bg-green-700 active:bg-green-900 text-white px-2 sm:px-3 py-1 sm:py-2 text-sm font-bold border border-green-400 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 w-full sm:w-auto"
                       >
                         📤 RETRIEVE
                       </button>
@@ -1742,7 +1750,7 @@ export default function POS() {
                             index
                           )
                         }
-                        className="bg-red-800 hover:bg-red-700 active:bg-red-900 text-white px-2 sm:px-3 py-1 sm:py-2 text-xs font-bold border border-red-400 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 w-full sm:w-auto"
+                        className="bg-red-800 hover:bg-red-700 active:bg-red-900 text-white px-2 sm:px-3 py-1 sm:py-2 text-sm font-bold border border-red-400 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 w-full sm:w-auto"
                       >
                         🗑️ DELETE
                       </button>
