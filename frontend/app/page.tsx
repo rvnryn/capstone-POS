@@ -409,6 +409,7 @@ export default function POS() {
     console.log("Adding item to order:", item);
     pos.order.addItemToOrder({
       name: item.name,
+      category: selectedCategory,
       quantity: 1,
       price: item.price,
     });

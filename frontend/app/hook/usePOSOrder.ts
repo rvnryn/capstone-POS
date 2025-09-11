@@ -12,6 +12,7 @@ export interface OrderItem {
   quantity: number;
   price: number;
   total: number;
+  category?: string;
 }
 
 export interface Order {
@@ -86,6 +87,7 @@ export function usePOSOrder() {
                   price: item.unit_price,
                   quantity: item.quantity,
                   total: item.total_price,
+                  category: item.category,
                 })) || [],
               subtotal: order.subtotal,
               discount: order.discount,
@@ -147,6 +149,7 @@ export function usePOSOrder() {
             ...item,
             id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
             total: item.quantity * item.price,
+            category: item.category,
           };
           newItems = [...prev.items, newItem];
         }
@@ -271,6 +274,7 @@ export function usePOSOrder() {
           unit_price: item.price,
           quantity: item.quantity,
           total_price: item.total,
+          category: item.category,
         })),
       };
 
@@ -328,6 +332,7 @@ export function usePOSOrder() {
             unit_price: item.price,
             quantity: item.quantity,
             total_price: item.total,
+            category: item.category,
           })),
         };
 
@@ -385,6 +390,7 @@ export function usePOSOrder() {
               quantity: item.quantity,
               price: item.unit_price,
               total: item.total_price,
+              category: item.category,
             })) || [],
           subtotal: order.subtotal,
           discount: order.discount || 0,

@@ -20,6 +20,7 @@ class OrderItemCreate(BaseModel):
     unit_price: float
     quantity: int
     total_price: float
+    category: str = None
 
 
 class OrderCreate(BaseModel):
@@ -122,6 +123,7 @@ async def create_order_async(
                     unit_price=item.unit_price,
                     quantity=item.quantity,
                     total_price=item.total_price,
+                    category=getattr(item, "category", None),
                 )
                 for item in order_data.order_items
             ]

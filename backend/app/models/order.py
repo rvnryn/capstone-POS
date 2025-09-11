@@ -39,4 +39,5 @@ class OrderItem(Base):
     quantity = Column(Integer)
     total_price = Column(Float)
     created_at = Column(DateTime, default=datetime.utcnow)
+    category = Column(String)  # <-- Add this line
     order = relationship("Order", back_populates="order_items")

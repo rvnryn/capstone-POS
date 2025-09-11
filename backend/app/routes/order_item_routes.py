@@ -6,12 +6,14 @@ from app.supabase import supabase
 
 router = APIRouter(prefix="/api/order-items", tags=["order-items"])
 
+
 class OrderItemCreate(BaseModel):
     order_id: int
     item_name: str
     unit_price: float
     quantity: int
     total_price: float
+    category: Optional[str] = None
 
 
 class OrderItemUpdate(BaseModel):
@@ -28,6 +30,7 @@ class OrderItemResponse(BaseModel):
     quantity: int
     total_price: float
     created_at: datetime
+    category: Optional[str] = None
 
 
 @router.post("/", response_model=OrderItemResponse)
@@ -40,6 +43,7 @@ async def create_order_item(item_data: OrderItemCreate):
             "unit_price": item_data.unit_price,
             "quantity": item_data.quantity,
             "total_price": item_data.total_price,
+            "category": item_data.category,
         }
 
         result = supabase.table("order_items").insert(item_insert).execute()
@@ -167,7 +171,6 @@ async def get_popular_items(
     limit: int = 10, date_from: Optional[str] = None, date_to: Optional[str] = None
 ):
     try:
-
         query = supabase.table("order_items").select("*, orders(created_at)")
 
         if date_from:
@@ -180,13 +183,15 @@ async def get_popular_items(
 
         items = result.data or []
 
-        # Group by item_name and calculate totals
+        # Group by item_name and calculate totals, include category
         item_stats = {}
         for item in items:
             item_name = item["item_name"]
+            category = item.get("category")
             if item_name not in item_stats:
                 item_stats[item_name] = {
                     "item_name": item["item_name"],
+                    "category": category,
                     "total_quantity": 0,
                     "total_revenue": 0.0,
                     "order_count": 0,
