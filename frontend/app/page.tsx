@@ -614,10 +614,10 @@ export default function POS() {
         <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 max-w-xs sm:max-w-md w-full border-2 border-gray-300 font-mono">
           <div className="text-center mb-2">
             <div className="text-black font-bold text-xl">🖨️ RECEIPT</div>
-            <div className="text-base text-white font-medium">
+            <div className="text-base text-black font-medium">
               Cardiac Delights POS
             </div>
-            <div className="text-base text-white mb-2">
+            <div className="text-base text-black mb-2">
               {new Date().toLocaleString()}
             </div>
             <div className="border-b border-gray-400 my-2" />
@@ -625,23 +625,23 @@ export default function POS() {
           <div className="mb-2">
             <div className="flex justify-between text-sm">
               <span className="font-bold">Order #</span>
-              <span className="text-white">
+              <span className="text-black">
                 {getSequentialOrderNumber(orderData?.id)}
               </span>
             </div>
             <div className="flex justify-between text-base">
-              <span className="font-bold text-white">Customer</span>
-              <span className="text-white">{orderData?.customer}</span>
+              <span className="font-bold text-black">Customer</span>
+              <span className="text-black">{orderData?.customer}</span>
             </div>
             <div className="flex justify-between text-base">
-              <span className="font-bold text-white">Type</span>
-              <span className="text-white">{orderData?.type}</span>
+              <span className="font-bold text-black">Type</span>
+              <span className="text-black">{orderData?.type}</span>
             </div>
           </div>
           <div className="border-b border-gray-400 my-2" />
           <div className="mb-2">
-            <div className="font-bold text-base mb-1 text-white">Items:</div>
-            <div className="space-y-1 text-white">
+            <div className="font-bold text-base mb-1 text-black">Items:</div>
+            <div className="space-y-1 text-black">
               {orderData?.items?.map((item: any, idx: number) => (
                 <div
                   key={item.id}
@@ -1637,15 +1637,6 @@ export default function POS() {
               >
                 <span>📧</span>
                 Email Receipt
-              </button>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <button
-                onClick={pos.modals.closeReceiptSelectionModal}
-                className="flex-1 p-3 sm:p-4 md:p-5 bg-gray-700 hover:bg-gray-600 rounded-lg sm:rounded-xl text-white font-medium text-sm sm:text-base md:text-lg transition-all duration-200"
-              >
-                Skip Receipt
               </button>
             </div>
           </div>

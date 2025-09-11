@@ -112,18 +112,20 @@ async def create_order_async(
         )
         db.add(order)
         await db.flush()  # get order_id
-        items = [
-            OrderItem(
-                order_id=order.order_id,
-                item_name=item.item_name,
-                price=item.unit_price,
-                unit_price=item.unit_price,
-                quantity=item.quantity,
-                total_price=item.total_price,
-            )
-            for item in order_data.order_items
-        ]
-        db.add_all(items)
+        # Save order items for all orders except those with status 'canceled' or 'cancelled'
+        if order_data.order_status.lower() not in ["canceled", "cancelled"]:
+            items = [
+                OrderItem(
+                    order_id=order.order_id,
+                    item_name=item.item_name,
+                    price=item.unit_price,
+                    unit_price=item.unit_price,
+                    quantity=item.quantity,
+                    total_price=item.total_price,
+                )
+                for item in order_data.order_items
+            ]
+            db.add_all(items)
         await db.commit()
         await db.refresh(order)
         return {"order_id": order.order_id}
@@ -198,17 +200,21 @@ async def cancel_order_async(order_id: int, db: AsyncSession = Depends(get_db)):
         old_status = order.order_status
         order.order_status = "canceled"
         order.updated_at = datetime.utcnow()
+        # Delete all order items for this order
+        await db.execute(
+            OrderItem.__table__.delete().where(OrderItem.order_id == order.order_id)
+        )
         await db.commit()
         await db.refresh(order)
 
         print(
-            f"[DEBUG] Successfully canceled order {order.order_id}, status changed from '{old_status}' to 'canceled'"
+            f"[DEBUG] Successfully canceled order {order.order_id}, status changed from '{old_status}' to 'canceled' and order items deleted"
         )
 
         return {
             "order_id": order.order_id,
             "order_status": order.order_status,
-            "message": "Order canceled successfully",
+            "message": "Order canceled successfully and items deleted",
         }
     except HTTPException:
         await db.rollback()
@@ -220,7 +226,6 @@ async def cancel_order_async(order_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=500, detail=error_msg)
 
 
-# Get a single order by ID
 @router.get("/{order_id}")
 async def get_order_async(order_id: int, db: AsyncSession = Depends(get_db)):
     try:
@@ -242,7 +247,6 @@ async def get_order_async(order_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Failed to fetch order: {str(e)}")
 
 
-# Get all orders with optional filters
 @router.get("/", response_model=List[dict])
 async def get_orders_async(
     status: str = None,
@@ -280,8 +284,6 @@ async def get_orders_async(
         raise HTTPException(status_code=500, detail=f"Failed to fetch orders: {str(e)}")
 
 
-# Update order status (already present, but add response_model for consistency)
-# Get today's order summary
 @router.get("/today/summary")
 async def get_today_summary_async(db: AsyncSession = Depends(get_db)):
     try:
@@ -335,10 +337,6 @@ async def get_today_summary_async(db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Failed to get summary: {str(e)}")
 
 
-# Cancel route moved before generic get route
-
-
-# Cancel (soft delete) an order
 @router.delete("/{order_id}")
 async def delete_order_async(order_id: int, db: AsyncSession = Depends(get_db)):
     try:
