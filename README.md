@@ -2,9 +2,7 @@
 
 <!-- HEADER STYLE: CLASSIC -->
 <div align="left">
-
-<img src="capstone-POS.png" width="30%" style="position: relative; top: 0; right: 0;" alt="Project Logo"/>
-
+	
 # CAPSTONE-POS
 
 <em>Transform Transactions, Elevate Customer Experiences Instantly</em>
