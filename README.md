@@ -2,9 +2,6 @@
 
 <!-- HEADER STYLE: CLASSIC -->
 <div align="left">
-
-<img src="[logo.png](https://github.com/AcsOfficial/capstone-POS/blob/main/frontend/public/logo.png)" width="30%" style="position: relative; top: 0; right: 0;" alt="Project Logo"/>
-
 # CAPSTONE-POS
 
 <em>Transform Transactions, Elevate Customer Experiences Instantly</em>
