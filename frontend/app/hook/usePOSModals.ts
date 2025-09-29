@@ -41,6 +41,7 @@ export function usePOSModals() {
     gcashReference: { type: null, isOpen: false },
     cashPayment: { type: null, isOpen: false },
     notes: { type: null, isOpen: false },
+    discount: { type: null, isOpen: false },
   });
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
@@ -51,6 +52,12 @@ export function usePOSModals() {
   const [customerEmail, setCustomerEmail] = useState("");
   const [receiptType, setReceiptType] = useState<"print" | "email">("print");
   const [tempNotes, setTempNotes] = useState("");
+
+  // Discount modal states
+  const [discountType, setDiscountType] = useState("");
+  const [discountValue, setDiscountValue] = useState("");
+  const [discountReason, setDiscountReason] = useState("");
+  const [discountIdNumber, setDiscountIdNumber] = useState("");
 
   const openModal = useCallback((modalName: string, data?: any) => {
     setModals((prev) => ({
@@ -84,6 +91,12 @@ export function usePOSModals() {
     }
     if (modalName === "notes") {
       setTempNotes("");
+    }
+    if (modalName === "discount") {
+      setDiscountType("");
+      setDiscountValue("");
+      setDiscountReason("");
+      setDiscountIdNumber("");
     }
   }, []);
 
@@ -172,6 +185,19 @@ export function usePOSModals() {
     closeModal("notes");
   }, [closeModal]);
 
+  const openDiscountModal = useCallback(() => {
+    openModal("discount");
+  }, [openModal]);
+
+  const closeDiscountModal = useCallback(() => {
+    closeModal("discount");
+  }, [closeModal]);
+
+  const applyDiscount = useCallback(() => {
+    // You may want to call a function to update the order with discount details here
+    closeDiscountModal();
+  }, [closeDiscountModal]);
+
   const isAnyModalOpen = useCallback((): boolean => {
     return Object.values(modals).some((modal) => modal.isOpen);
   }, [modals]);
@@ -206,6 +232,15 @@ export function usePOSModals() {
     tempNotes,
     setTempNotes,
 
+    discountType,
+    setDiscountType,
+    discountValue,
+    setDiscountValue,
+    discountReason,
+    setDiscountReason,
+    discountIdNumber,
+    setDiscountIdNumber,
+
     openModal,
     closeModal,
     closeAllModals,
@@ -229,5 +264,8 @@ export function usePOSModals() {
     closeCashPaymentModal,
     openNotesModal,
     closeNotesModal,
+    openDiscountModal,
+    closeDiscountModal,
+    applyDiscount,
   };
 }

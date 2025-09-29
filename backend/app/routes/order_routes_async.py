@@ -27,6 +27,10 @@ class OrderCreate(BaseModel):
     customer_name: str = "Walk-in Customer"
     order_type: str = "Dining"
     discount: float = 0.0
+    discount_type: str = None
+    discount_value: float = None
+    discount_reason: str = None
+    discount_id_number: str = None
     vat: float
     subtotal: float
     total_amount: float
@@ -98,6 +102,10 @@ async def create_order_async(
             order_type=order_data.order_type,
             subtotal=order_data.subtotal,
             discount=order_data.discount,
+            discount_type=order_data.discount_type,
+            discount_value=order_data.discount_value,
+            discount_reason=order_data.discount_reason,
+            discount_id_number=order_data.discount_id_number,
             vat=order_data.vat,
             total_amount=order_data.total_amount,
             payment_method=order_data.payment_method,
@@ -132,6 +140,7 @@ async def create_order_async(
         await db.refresh(order)
         return {"order_id": order.order_id}
     except Exception as e:
+        print("Order creation error:", e)
         await db.rollback()
         raise HTTPException(status_code=500, detail=f"Failed to create order: {str(e)}")
 

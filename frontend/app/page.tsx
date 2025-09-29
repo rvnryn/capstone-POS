@@ -111,6 +111,27 @@ export default function POS() {
     type: "default" as "default" | "danger" | "warning",
   });
 
+  const isIdNumberValid = () => {
+    if (
+      pos.modals.discountType === "Senior" ||
+      pos.modals.discountType === "PWD"
+    ) {
+      // Required and must be 4-6 digits
+      return /^\d{4,6}$/.test(pos.modals.discountIdNumber.trim());
+    }
+    return true;
+  };
+
+  const isDiscountFormValid = () => {
+    if (
+      pos.modals.discountType === "Senior" ||
+      pos.modals.discountType === "PWD"
+    ) {
+      return pos.modals.discountIdNumber.trim().length > 0 && isIdNumberValid();
+    }
+    return true;
+  };
+
   const categories = [
     "Rice Toppings",
     "Sizzlers",
@@ -800,6 +821,29 @@ export default function POS() {
     );
   };
 
+  // Discount application handler
+  const handleApplyDiscount = () => {
+    let discountAmount = 0;
+    if (
+      pos.modals.discountType === "Senior" ||
+      pos.modals.discountType === "PWD"
+    ) {
+      discountAmount = (pos.order.currentOrder.subtotal ?? 0) * 0.2;
+    } else if (pos.modals.discountValue) {
+      const value = parseFloat(pos.modals.discountValue);
+      if (!isNaN(value)) {
+        if (value <= 100) {
+          discountAmount =
+            (pos.order.currentOrder.subtotal ?? 0) * (value / 100);
+        } else {
+          discountAmount = value;
+        }
+      }
+    }
+    pos.order.applyDiscount(discountAmount);
+    pos.modals.closeDiscountModal();
+  };
+
   const filteredMenuItems =
     menuItems[selectedCategory as keyof typeof menuItems] || [];
 
@@ -1161,6 +1205,13 @@ export default function POS() {
                 className="bg-gradient-to-br from-orange-600/90 to-orange-700/90 hover:from-orange-500/90 hover:to-orange-600/90 active:from-orange-700/90 active:to-orange-800/90 disabled:from-slate-700/50 disabled:to-slate-800/50 text-white disabled:text-slate-500 px-3 sm:px-6 py-3 sm:py-6 text-sm sm:text-base font-bold border border-orange-400/70 disabled:border-slate-600/50 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 min-h-[50px] sm:min-h-[60px]"
               >
                 TAKEOUT
+              </button>
+              <button
+                onClick={() => pos.modals.openDiscountModal()}
+                disabled={pos.order.currentOrder.items.length === 0}
+                className="bg-gradient-to-br from-yellow-600/90 to-yellow-700/90 hover:from-yellow-500/90 hover:to-yellow-600/90 active:from-yellow-700/90 active:to-yellow-800/90 disabled:from-slate-700/50 disabled:to-slate-800/50 text-white disabled:text-slate-500 px-3 sm:px-6 py-3 sm:py-6 text-sm sm:text-base font-bold border border-yellow-400/70 disabled:border-slate-600/50 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95 min-h-[50px] sm:min-h-[60px]"
+              >
+                DISCOUNT
               </button>
               <button
                 onClick={showPaymentOptions}
@@ -1596,6 +1647,123 @@ export default function POS() {
                 className="flex-1 bg-purple-700 hover:bg-purple-600 active:bg-purple-800 text-white px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold border border-purple-500 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95"
               >
                 ✅ SAVE NOTES
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Discount Modal */}
+      {pos.modals.isModalOpen("discount") && (
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[9999] p-2 sm:p-4">
+          <div className="bg-gray-900 border-2 border-yellow-400 p-3 sm:p-4 md:p-6 rounded-lg shadow-xl max-w-xs sm:max-w-md w-full">
+            <h3 className="text-yellow-400 text-sm sm:text-lg md:text-xl font-bold mb-2 sm:mb-3 md:mb-4 text-center uppercase tracking-wide">
+              🎟️ APPLY DISCOUNT
+            </h3>
+            <p className="text-gray-300 mb-2 sm:mb-3 md:mb-4 text-center text-xs sm:text-sm">
+              Select discount type and enter details:
+            </p>
+            <div className="mb-2">
+              <label className="block text-xs text-white mb-1">
+                Discount Type
+              </label>
+              <select
+                value={pos.modals.discountType}
+                onChange={(e) => pos.modals.setDiscountType(e.target.value)}
+                className="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white text-xs"
+              >
+                <option value="">Select type</option>
+                <option value="Senior">Senior Citizen</option>
+                <option value="PWD">PWD</option>
+                <option value="Special">Special Discount</option>
+              </select>
+            </div>
+            <div className="mb-2">
+              <label className="block text-xs text-white mb-1">
+                Discount Value (₱ or %)
+              </label>
+              {pos.modals.discountType === "Senior" ? (
+                <input
+                  type="text"
+                  value="20%"
+                  disabled
+                  className="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white text-xs opacity-60"
+                  placeholder="20% discount"
+                />
+              ) : pos.modals.discountType === "PWD" ? (
+                <input
+                  type="text"
+                  value="20%"
+                  disabled
+                  className="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white text-xs opacity-60"
+                  placeholder="20% discount"
+                />
+              ) : (
+                <input
+                  type="number"
+                  min="0"
+                  value={pos.modals.discountValue}
+                  onChange={(e) => pos.modals.setDiscountValue(e.target.value)}
+                  className="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white text-xs"
+                  placeholder="Enter value"
+                />
+              )}
+            </div>
+            <div className="mb-2">
+              <label className="block text-xs text-white mb-1">Reason</label>
+              <input
+                type="text"
+                value={pos.modals.discountReason}
+                onChange={(e) => pos.modals.setDiscountReason(e.target.value)}
+                className="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white text-xs"
+                placeholder="Enter reason"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-xs text-white mb-1">
+                ID Number (if applicable)
+              </label>
+              <input
+                type="text"
+                value={pos.modals.discountIdNumber}
+                onChange={(e) => pos.modals.setDiscountIdNumber(e.target.value)}
+                className={`w-full p-2 bg-gray-800 border border-gray-600 rounded text-white text-xs ${
+                  !isIdNumberValid() && pos.modals.discountIdNumber
+                    ? "border-red-500"
+                    : ""
+                }`}
+                placeholder="Enter ID number"
+                required={
+                  pos.modals.discountType === "Senior" ||
+                  pos.modals.discountType === "PWD"
+                }
+              />
+              {pos.modals.discountType &&
+                (pos.modals.discountType === "Senior" ||
+                  pos.modals.discountType === "PWD") &&
+                (!pos.modals.discountIdNumber.trim() ? (
+                  <div className="text-red-500 text-xs mt-1">
+                    ID number is required for Senior/PWD discount.
+                  </div>
+                ) : !isIdNumberValid() ? (
+                  <div className="text-red-500 text-xs mt-1">
+                    ID number must be 4 to 6 digits.
+                  </div>
+                ) : null)}
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              <button
+                onClick={pos.modals.closeDiscountModal}
+                className="flex-1 bg-red-700 hover:bg-red-600 active:bg-red-800 text-white px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold border border-red-500 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95"
+              >
+                ❌ CANCEL
+              </button>
+              <button
+                onClick={handleApplyDiscount}
+                disabled={!pos.modals.discountType || !isDiscountFormValid()}
+                className="flex-1 bg-yellow-700 hover:bg-yellow-600 active:bg-yellow-800 text-white px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold border border-yellow-500 transition-all uppercase tracking-wider touch-manipulation cursor-pointer select-none active:scale-95"
+              >
+                ✅ APPLY DISCOUNT
               </button>
             </div>
           </div>
