@@ -55,6 +55,9 @@ export function usePOSModals() {
 
   // Discount modal states
   const [discountType, setDiscountType] = useState("");
+  const [discountMethod, setDiscountMethod] = useState<"percentage" | "fixed">(
+    "percentage"
+  );
   const [discountValue, setDiscountValue] = useState("");
   const [discountReason, setDiscountReason] = useState("");
   const [discountIdNumber, setDiscountIdNumber] = useState("");
@@ -94,6 +97,7 @@ export function usePOSModals() {
     }
     if (modalName === "discount") {
       setDiscountType("");
+      setDiscountMethod("percentage");
       setDiscountValue("");
       setDiscountReason("");
       setDiscountIdNumber("");
@@ -234,6 +238,8 @@ export function usePOSModals() {
 
     discountType,
     setDiscountType,
+    discountMethod,
+    setDiscountMethod,
     discountValue,
     setDiscountValue,
     discountReason,

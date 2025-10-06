@@ -832,11 +832,24 @@ export default function POS() {
     } else if (pos.modals.discountValue) {
       const value = parseFloat(pos.modals.discountValue);
       if (!isNaN(value)) {
-        if (value <= 100) {
-          discountAmount =
-            (pos.order.currentOrder.subtotal ?? 0) * (value / 100);
+        if (pos.modals.discountMethod === "fixed") {
+          // Fixed amount discount (e.g., 200 pesos off)
+          discountAmount = Math.min(
+            value,
+            pos.order.currentOrder.subtotal ?? 0
+          );
         } else {
-          discountAmount = value;
+          // Percentage discount
+          if (value <= 100) {
+            discountAmount =
+              (pos.order.currentOrder.subtotal ?? 0) * (value / 100);
+          } else {
+            // If percentage > 100%, treat as fixed amount
+            discountAmount = Math.min(
+              value,
+              pos.order.currentOrder.subtotal ?? 0
+            );
+          }
         }
       }
     }
@@ -1678,9 +1691,33 @@ export default function POS() {
                 <option value="Special">Special Discount</option>
               </select>
             </div>
+            {pos.modals.discountType === "Special" && (
+              <div className="mb-2">
+                <label className="block text-xs text-white mb-1">
+                  Discount Method
+                </label>
+                <select
+                  value={pos.modals.discountMethod || "percentage"}
+                  onChange={(e) =>
+                    pos.modals.setDiscountMethod(
+                      e.target.value as "percentage" | "fixed"
+                    )
+                  }
+                  className="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white text-xs"
+                >
+                  <option value="percentage">Percentage (%)</option>
+                  <option value="fixed">Fixed Amount (₱)</option>
+                </select>
+              </div>
+            )}
             <div className="mb-2">
               <label className="block text-xs text-white mb-1">
-                Discount Value (₱ or %)
+                {pos.modals.discountType === "Senior" ||
+                pos.modals.discountType === "PWD"
+                  ? "Discount Value (%)"
+                  : pos.modals.discountMethod === "fixed"
+                  ? "Discount Amount (₱)"
+                  : "Discount Value (%)"}
               </label>
               {pos.modals.discountType === "Senior" ? (
                 <input
@@ -1702,10 +1739,20 @@ export default function POS() {
                 <input
                   type="number"
                   min="0"
+                  step={pos.modals.discountMethod === "fixed" ? "1" : "0.01"}
+                  max={
+                    pos.modals.discountMethod === "percentage"
+                      ? "100"
+                      : undefined
+                  }
                   value={pos.modals.discountValue}
                   onChange={(e) => pos.modals.setDiscountValue(e.target.value)}
                   className="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white text-xs"
-                  placeholder="Enter value"
+                  placeholder={
+                    pos.modals.discountMethod === "fixed"
+                      ? "Enter amount in pesos"
+                      : "Enter percentage"
+                  }
                 />
               )}
             </div>
