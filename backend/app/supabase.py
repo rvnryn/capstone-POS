@@ -1,24 +1,30 @@
-from supabase import create_client, Client
-import os
-from dotenv import load_dotenv
-
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+from contextlib import asynccontextmanager
+import os
 
-# Load environment variables
-load_dotenv()
+# 🔹 Environment variable should contain your full Supabase connection URL
+# Example: postgresql+asyncpg://postgres:<password>@<host>:5432/postgres
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Initialize Supabase client
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_API_KEY = os.getenv("SUPABASE_KEY")
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_API_KEY)
+# ✅ FIXED ENGINE CONFIGURATION
+engine = create_async_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,                # detects invalid connections
+    pool_reset_on_return="commit",     # clears asyncpg cached statements on commit
+    future=True
+)
 
-# SQLAlchemy engine/session for direct Postgres access
-POSTGRES_URL = os.getenv("POSTGRES_URL")
-engine = create_async_engine(POSTGRES_URL, echo=False)
-SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+# Session factory
+AsyncSessionLocal = sessionmaker(
+    bind=engine, class_=AsyncSession, expire_on_commit=False
+)
 
+# Dependency injection for FastAPI
+@asynccontextmanager
 async def get_db():
-    async with SessionLocal() as session:
-        yield session
-
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+        finally:
+            await session.close()
