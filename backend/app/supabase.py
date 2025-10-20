@@ -9,7 +9,6 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 # SQLAlchemy async setup
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from contextlib import asynccontextmanager
 
 DATABASE_URL = os.getenv("POSTGRES_URL")
 if not DATABASE_URL:
@@ -26,10 +25,6 @@ AsyncSessionLocal = sessionmaker(
     bind=engine, class_=AsyncSession, expire_on_commit=False
 )
 
-@asynccontextmanager
 async def get_db():
     async with AsyncSessionLocal() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
+        yield session
